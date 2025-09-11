@@ -1,0 +1,43 @@
+<!--blacklist-verify.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">黑名单校验</text>
+    <text class="subtitle">正在检查您的报名资格</text>
+  </view>
+  
+  <view class="verify-card">
+    <view class="verify-icon">
+      <image wx:if="{{verifyStatus === 'pending' || verifyStatus === 'verifying'}}" 
+             class="loading-icon" src="/images/loading.gif"></image>
+      <image wx:if="{{verifyStatus === 'passed'}}" 
+             class="result-icon" src="/images/success.png"></image>
+      <image wx:if="{{verifyStatus === 'failed'}}" 
+             class="result-icon" src="/images/error.png"></image>
+    </view>
+    
+    <view class="progress-container" wx:if="{{verifyStatus === 'verifying'}}">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{progress}}%"></view>
+      </view>
+      <text class="progress-text">{{progress}}%</text>
+    </view>
+    
+    <text class="verify-message">{{verifyMessage}}</text>
+    
+    <view class="actions" wx:if="{{verifyStatus !== 'verifying'}}">
+      <button wx:if="{{verifyStatus === 'passed'}}" 
+              class="continue-btn" 
+              bindtap="continueNext">继续报名</button>
+      <button wx:if="{{verifyStatus === 'failed'}}" 
+              class="back-btn" 
+              bindtap="goBack">返回上一步</button>
+    </view>
+  </view>
+  
+  <view class="info-tips">
+    <text class="tips-title">校验说明</text>
+    <text class="tips-text">• 系统将自动检查您的报名资格</text>
+    <text class="tips-text">• 校验过程大约需要3-5秒</text>
+    <text class="tips-text">• 如有疑问请联系管理员</text>
+  </view>
+</view>

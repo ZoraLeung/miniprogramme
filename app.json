@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/position-check/position-check",
+    "pages/blacklist-verify/blacklist-verify", 
+    "pages/notice/notice",
+    "pages/registration/registration",
+    "pages/payment-upload/payment-upload",
+    "pages/success/success"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "学员报名系统",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

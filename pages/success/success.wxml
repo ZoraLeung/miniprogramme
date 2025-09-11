@@ -1,0 +1,63 @@
+<!--success.wxml-->
+<view class="container">
+  <view class="success-card">
+    <view class="success-icon">
+      <image class="icon" src="/images/success-large.png"></image>
+    </view>
+    
+    <text class="success-title">报名提交成功！</text>
+    <text class="success-subtitle">您的报名信息已成功提交到系统</text>
+    
+    <view class="registration-info">
+      <view class="info-item">
+        <text class="info-label">报名编号</text>
+        <view class="info-value-container">
+          <text class="info-value registration-id">{{registrationId}}</text>
+          <button class="copy-btn" bindtap="copyRegistrationId">复制</button>
+        </view>
+      </view>
+      
+      <view class="info-item" wx:if="{{registrationInfo.name}}">
+        <text class="info-label">报名姓名</text>
+        <text class="info-value">{{registrationInfo.name}}</text>
+      </view>
+      
+      <view class="info-item" wx:if="{{registrationInfo.position}}">
+        <text class="info-label">报名岗位</text>
+        <text class="info-value">{{registrationInfo.position}}</text>
+      </view>
+      
+      <view class="info-item">
+        <text class="info-label">提交时间</text>
+        <text class="info-value">{{registrationInfo.submitTime}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="next-steps">
+    <text class="steps-title">后续流程</text>
+    <view class="step-list">
+      <view class="step-item">
+        <view class="step-number">1</view>
+        <text class="step-text">工作人员将在1-3个工作日内审核您的报名信息</text>
+      </view>
+      <view class="step-item">
+        <view class="step-number">2</view>
+        <text class="step-text">审核通过后将通过短信/邮件通知您</text>
+      </view>
+      <view class="step-item">
+        <view class="step-number">3</view>
+        <text class="step-text">请保持手机畅通，注意接收相关通知</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="action-buttons">
+    <button class="btn secondary" bindtap="contactService">联系客服</button>
+    <button class="btn primary" bindtap="backToHome">返回首页</button>
+  </view>
+  
+  <view class="tips">
+    <text class="tips-text">温馨提示：请妥善保存报名编号，后续查询时需要使用</text>
+  </view>
+</view>

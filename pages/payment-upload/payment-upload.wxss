@@ -1,0 +1,198 @@
+/* payment-upload.wxss */
+.container {
+  padding: 40rpx;
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.payment-info {
+  background: white;
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.1);
+}
+
+.info-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 30rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.amount {
+  color: #ff4d4f;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.upload-section {
+  background: white;
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.1);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 30rpx;
+}
+
+.upload-area {
+  border: 2rpx dashed #d9d9d9;
+  border-radius: 12rpx;
+  padding: 60rpx 20rpx;
+  text-align: center;
+  background: #fafafa;
+}
+
+.upload-area:active {
+  background: #f0f0f0;
+}
+
+.upload-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.6;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.upload-tip {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.image-preview {
+  text-align: center;
+}
+
+.preview-image {
+  width: 300rpx;
+  height: 400rpx;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
+}
+
+.image-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20rpx;
+}
+
+.action-btn {
+  padding: 16rpx 32rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+}
+
+.preview-btn {
+  background: #007aff;
+  color: white;
+}
+
+.delete-btn {
+  background: #ff4d4f;
+  color: white;
+}
+
+.tips-section {
+  background: #f0f9ff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  border: 1rpx solid #e1f5fe;
+}
+
+.tips-title {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #0277bd;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.tips-text {
+  font-size: 24rpx;
+  color: #01579b;
+  display: block;
+  margin-bottom: 8rpx;
+  line-height: 1.5;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 40rpx;
+  background: white;
+  border-top: 1rpx solid #eee;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #52c41a;
+  color: white;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  line-height: 80rpx;
+}
+
+.submit-btn[disabled] {
+  background: #ccc;
+}

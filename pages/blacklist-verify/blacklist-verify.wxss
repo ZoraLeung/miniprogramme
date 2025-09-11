@@ -1,0 +1,132 @@
+/* blacklist-verify.wxss */
+.container {
+  padding: 40rpx;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.verify-card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 60rpx 40rpx;
+  text-align: center;
+  margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
+}
+
+.verify-icon {
+  margin-bottom: 40rpx;
+}
+
+.loading-icon {
+  width: 80rpx;
+  height: 80rpx;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.result-icon {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.progress-container {
+  margin-bottom: 40rpx;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007aff, #00d4aa);
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.verify-message {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 40rpx;
+  line-height: 1.6;
+}
+
+.actions {
+  
+}
+
+.continue-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #52c41a;
+  color: white;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  line-height: 80rpx;
+}
+
+.back-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #ff4d4f;
+  color: white;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  line-height: 80rpx;
+}
+
+.info-tips {
+  background: #f0f9ff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  border: 1rpx solid #e1f5fe;
+}
+
+.tips-title {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #0277bd;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.tips-text {
+  font-size: 24rpx;
+  color: #01579b;
+  display: block;
+  margin-bottom: 8rpx;
+  line-height: 1.5;
+}

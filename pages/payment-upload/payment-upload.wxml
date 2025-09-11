@@ -1,0 +1,59 @@
+<!--payment-upload.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">上传缴费截图</text>
+    <text class="subtitle">请上传报名费用的支付凭证</text>
+  </view>
+  
+  <view class="payment-info">
+    <text class="info-title">缴费信息</text>
+    <view class="info-item">
+      <text class="info-label">报名费用：</text>
+      <text class="info-value amount">¥{{paymentInfo.amount}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">支付方式：</text>
+      <text class="info-value">{{paymentInfo.method}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">收款账户：</text>
+      <text class="info-value">{{paymentInfo.account}}</text>
+    </view>
+  </view>
+  
+  <view class="upload-section">
+    <text class="section-title">上传缴费截图</text>
+    
+    <view class="upload-area" wx:if="{{!imageUploaded}}" bindtap="chooseImage">
+      <image class="upload-icon" src="/images/upload.png"></image>
+      <text class="upload-text">点击上传缴费截图</text>
+      <text class="upload-tip">支持JPG、PNG格式，大小不超过5MB</text>
+    </view>
+    
+    <view class="image-preview" wx:if="{{imageUploaded}}">
+      <image class="preview-image" 
+             src="{{uploadedImage}}" 
+             mode="aspectFill"
+             bindtap="previewImage"></image>
+      <view class="image-actions">
+        <button class="action-btn preview-btn" bindtap="previewImage">预览</button>
+        <button class="action-btn delete-btn" bindtap="deleteImage">删除</button>
+      </view>
+    </view>
+  </view>
+  
+  <view class="tips-section">
+    <text class="tips-title">上传说明</text>
+    <text class="tips-text">• 请确保截图清晰完整，包含支付金额和时间</text>
+    <text class="tips-text">• 上传后请仔细检查图片是否清晰可见</text>
+    <text class="tips-text">• 缴费凭证将作为报名审核的重要依据</text>
+  </view>
+  
+  <view class="footer">
+    <button class="submit-btn" 
+            bindtap="submitPayment"
+            disabled="{{!imageUploaded}}">
+      完成报名提交
+    </button>
+  </view>
+</view>

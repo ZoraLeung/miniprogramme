@@ -1,0 +1,38 @@
+<!--notice.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">报名须知</text>
+    <text class="subtitle">请仔细阅读以下内容</text>
+  </view>
+  
+  <view class="notice-card">
+    <scroll-view class="notice-content" 
+                 scroll-y="true" 
+                 bindscroll="onScroll">
+      <text class="notice-text">{{noticeContent}}</text>
+    </scroll-view>
+  </view>
+  
+  <view class="agreement">
+    <checkbox-group bindchange="onAgreeChange">
+      <label class="agreement-item">
+        <checkbox value="agree" disabled="{{!hasRead}}" />
+        <text class="agreement-text {{!hasRead ? 'disabled' : ''}}">
+          我已仔细阅读并同意以上报名须知
+        </text>
+      </label>
+    </checkbox-group>
+  </view>
+  
+  <view class="footer">
+    <button class="continue-btn" 
+            bindtap="continueNext" 
+            disabled="{{!canContinue}}">
+      继续填写报名信息
+    </button>
+  </view>
+  
+  <view class="scroll-tip" wx:if="{{!hasRead}}">
+    <text class="tip-text">请滑动到底部阅读完整内容</text>
+  </view>
+</view>

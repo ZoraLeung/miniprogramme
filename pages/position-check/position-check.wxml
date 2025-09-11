@@ -1,0 +1,37 @@
+<!--position-check.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">岗位保护查询</text>
+    <text class="subtitle">请输入身份信息进行查询</text>
+  </view>
+  
+  <view class="form-card">
+    <view class="form-group">
+      <text class="label">身份证号</text>
+      <input class="input" placeholder="请输入身份证号" value="{{idNumber}}" bindinput="onIdNumberInput" />
+    </view>
+    
+    <view class="form-group" wx:if="{{showStudentId}}">
+      <text class="label">学号</text>
+      <input class="input" placeholder="请输入学号" value="{{studentId}}" bindinput="onStudentIdInput" />
+    </view>
+    
+    <button class="query-btn" bindtap="queryPosition" disabled="{{!canQuery}}">查询岗位保护</button>
+  </view>
+  
+  <view class="result-card" wx:if="{{showResult}}">
+    <view class="result-header">
+      <text class="result-title">查询结果</text>
+    </view>
+    <view class="result-content">
+      <text class="result-text {{resultType}}">{{resultMessage}}</text>
+    </view>
+    <button class="continue-btn" wx:if="{{canContinue}}" bindtap="continueNext">继续报名</button>
+  </view>
+  
+  <view class="tips">
+    <text class="tips-title">温馨提示</text>
+    <text class="tips-text">• 岗位保护查询是必要步骤，请如实填写</text>
+    <text class="tips-text">• 如有疑问，请联系管理员</text>
+  </view>
+</view>

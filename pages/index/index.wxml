@@ -1,0 +1,29 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="header">
+    <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+    <text class="title">学员报名系统</text>
+    <text class="subtitle">请按流程完成报名</text>
+  </view>
+  
+  <view class="main">
+    <view class="info-card">
+      <text class="info-title">报名流程</text>
+      <view class="steps">
+        <view class="step">1. 岗位保护查询</view>
+        <view class="step">2. 黑名单校验</view>
+        <view class="step">3. 阅读报名须知</view>
+        <view class="step">4. 填写报名信息</view>
+        <view class="step">5. 上传缴费截图</view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="footer">
+    <button class="start-btn" bindtap="startRegistration">开始报名</button>
+    <view class="links">
+      <text class="link">常见问题</text>
+      <text class="link">联系我们</text>
+    </view>
+  </view>
+</view>
