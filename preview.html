@@ -13,7 +13,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f0f0f0;
+            background: white;
             overflow-x: hidden;
         }
         
@@ -612,11 +612,16 @@
     <div class="page-controls">
         <h3>页面导航</h3>
         <button class="page-btn active" onclick="showPage('index')">1. 首页 (pages/index/)</button>
-        <button class="page-btn" onclick="showPage('position-check')">2. 岗位保护查询 (pages/position-check/)</button>
-        <button class="page-btn" onclick="showPage('notice')">3. 报名须知 (pages/notice/)</button>
-        <button class="page-btn" onclick="showPage('registration')">4. 报名信息填写 (pages/registration/)</button>
-        <button class="page-btn" onclick="showPage('payment-upload')">5. 缴费截图上传 (pages/payment-upload/)</button>
-        <button class="page-btn" onclick="showPage('success')">6. 提交成功 (pages/success/)</button>
+        <button class="page-btn" onclick="showPage('phone-auth')">2. 手机号授权 (pages/phone-auth/)</button>
+        <button class="page-btn" onclick="showPage('position-check')">3. 岗位保护查询 (pages/position-check/)</button>
+        <button class="page-btn" onclick="showPage('notice')">4. 报名须知 (pages/notice/)</button>
+        <button class="page-btn" onclick="showPage('registration')">5. 报名信息填写 (pages/registration/)</button>
+        <button class="page-btn" onclick="showPage('registration-status')">6a. 报名成功状态 (pages/registration-status/)</button>
+        <button class="page-btn" onclick="showPage('registration-failed')">6b. 报名失败状态 (pages/registration-failed/)</button>
+        <button class="page-btn" onclick="showPage('registration-queue')">6c. 报名排队状态 (pages/registration-queue/)</button>
+        <button class="page-btn" onclick="showPage('payment-upload')">7. 缴费截图上传 (pages/payment-upload/)</button>
+        <button class="page-btn" onclick="showPage('success')">8. 提交成功 (pages/success/)</button>
+        <button class="page-btn" onclick="showPage('approval-result')">9. 审核通过 (pages/approval-result/)</button>
     </div>
 
     <div class="phone-container">
@@ -671,6 +676,38 @@
                             <div class="links">
                                 <span class="link">常见问题</span>
                                 <span class="link">联系我们</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 手机号授权页 - pages/phone-auth/phone-auth.js -->
+                <div id="phone-auth" class="page">
+                    <div class="container">
+                        <div class="header">
+                            <div class="title">手机号授权</div>
+                            <div class="subtitle">请授权获取您的手机号用于报名</div>
+                        </div>
+                        
+                        <div class="main">
+                            <div class="info-card">
+                                <div style="font-size: 80px; text-align: center; margin-bottom: 20px;">📱</div>
+                                <div class="info-title">为什么需要手机号？</div>
+                                <div class="reasons" style="text-align: left; margin-bottom: 20px;">
+                                    <div style="padding: 10px 0; color: #666;">• 用于报名信息确认和通知</div>
+                                    <div style="padding: 10px 0; color: #666;">• 保障您的报名权益</div>
+                                    <div style="padding: 10px 0; color: #666;">• 重要通知及时推送</div>
+                                </div>
+                                <div style="font-size: 12px; color: #999; text-align: center;">我们承诺严格保护您的隐私信息</div>
+                            </div>
+                        </div>
+                        
+                        <div class="footer">
+                            <button class="btn" style="background: #07c160; color: white; margin-bottom: 15px;" onclick="showNextPage('position-check')">
+                                授权手机号
+                            </button>
+                            <div style="text-align: center; margin-top: 15px;">
+                                <span style="color: #ff4d4f; font-size: 14px;">⚠️ 不完成授权无法进行查询或报名</span>
                             </div>
                         </div>
                     </div>
@@ -773,26 +810,25 @@
                             <div class="notice-content" id="noticeContent" onscroll="checkScroll()">
                                 <div class="notice-text">报名须知
 
-1. 报名条件
-   • 年满18周岁，身体健康
-   • 具备相应的学历要求
-   • 无不良记录
+1. 岗位保护说明
+   • 本次面试招生采用1：1岗位保护，即岗位招聘人数为机构最多招收学员人数。例如，若某岗位招聘3人，我们该岗位最多招收3名学员。
 
-2. 报名流程  
-   • 通过岗位保护查询
-   • 完成黑名单校验
-   • 阅读并同意本须知
-   • 填写完整报名信息
-   • 上传缴费凭证
+2. 学费缴纳要求  
+   • 报名协议班的学员需要在收到体检通知的两个自然日内补齐剩余学费，包含补录的学员。
 
-3. 注意事项
-   • 请确保填写信息真实有效
-   • 报名费用一经缴纳不予退还
-   • 如发现虚假信息将取消报名资格
+3. 师资安排
+   • 本次课程不支持指定以及更换老师。
+   • 师生比不超过1:12
 
-4. 联系方式
-   • 咨询电话：400-xxx-xxxx
-   • 工作时间：9:00-18:00</div>
+4. 退款方案
+   • 退款方案（需讨论）
+
+5. 住宿说明
+   • 报名课程附赠线下课程对应天数的住宿及次日早餐，住宿默认同性双人间。有需要入住单人间的同学，联系客服补差价。不住宿不退差价。
+
+6. 协议条款
+   • <span style="color: #007aff; text-decoration: underline;">《协议班协议》</span>
+   • <span style="color: #007aff; text-decoration: underline;">《非协议班协议》</span></div>
                             </div>
                         </div>
                         
@@ -828,27 +864,22 @@
                             </div>
                             
                             <div class="form-group">
-                                <label class="label">身份证号 <span class="required">*</span></label>
-                                <input class="input" disabled value="已从上一步获取" style="background: #f5f5f5; color: #999;" />
+                                <label class="label">微信号（微信号而非微信昵称） <span class="required">*</span></label>
+                                <input class="input" placeholder="请输入微信号" id="userWechat" />
                             </div>
                             
                             <div class="form-group">
-                                <label class="label">手机号码 <span class="required">*</span></label>
-                                <input class="input" placeholder="请输入手机号码" type="tel" maxlength="11" id="userPhone" />
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="label">电子邮箱 <span class="required">*</span></label>
-                                <input class="input" placeholder="请输入邮箱地址" type="email" id="userEmail" />
+                                <label class="label">电话号码 <span class="required">*</span></label>
+                                <input class="input" placeholder="已从授权获取，可修改" type="tel" maxlength="11" id="userPhone" />
                             </div>
                         </div>
                         
                         <div class="form-card">
-                            <div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">报名详情</div>
+                            <div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">岗位信息</div>
                             
                             <div class="form-group">
-                                <label class="label">报名岗位 <span class="required">*</span></label>
-                                <select class="picker" id="userPosition">
+                                <label class="label">岗位名称 <span class="required">*</span></label>
+                                <select class="picker" id="positionName">
                                     <option value="">请选择岗位</option>
                                     <option value="岗位A">岗位A</option>
                                     <option value="岗位B">岗位B</option>
@@ -858,30 +889,149 @@
                             </div>
                             
                             <div class="form-group">
-                                <label class="label">学历 <span class="required">*</span></label>
-                                <select class="picker" id="userEducation">
-                                    <option value="">请选择学历</option>
-                                    <option value="高中">高中</option>
-                                    <option value="大专">大专</option>
-                                    <option value="本科">本科</option>
-                                    <option value="硕士">硕士</option>
-                                    <option value="博士">博士</option>
+                                <label class="label">岗位招录人数</label>
+                                <input class="input" disabled value="3人（系统自动获取）" style="background: #f5f5f5; color: #999;" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="label">笔试排名 <span class="required">*</span></label>
+                                <input class="input" placeholder="请输入笔试排名" type="number" id="examRank" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="label">大中小围</label>
+                                <input class="input" disabled value="系统根据排名自动判断" style="background: #f5f5f5; color: #999;" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-card">
+                            <div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">课程选择</div>
+                            
+                            <div class="form-group">
+                                <label class="label">报名班型 <span class="required">*</span></label>
+                                <select class="picker" id="courseType">
+                                    <option value="">请选择班型</option>
+                                    <option value="面试班">面试班</option>
+                                    <option value="冲刺班">冲刺班</option>
+                                    <option value="精品班">精品班</option>
+                                    <option value="VIP班">VIP班</option>
                                 </select>
                             </div>
                             
                             <div class="form-group">
-                                <label class="label">工作经验</label>
-                                <textarea class="textarea" placeholder="请简述相关工作经验（选填）" maxlength="200" id="userExperience"></textarea>
+                                <label class="label">协议/非协议 <span class="required">*</span></label>
+                                <select class="picker" id="agreementType">
+                                    <option value="">请选择类型</option>
+                                    <option value="协议班">协议班</option>
+                                    <option value="非协议班">非协议班</option>
+                                </select>
                             </div>
                             
                             <div class="form-group">
-                                <label class="label">备注信息</label>
-                                <textarea class="textarea" placeholder="其他需要说明的信息（选填）" maxlength="200" id="userRemark"></textarea>
+                                <label class="label">所享优惠</label>
+                                <select class="picker" id="discount">
+                                    <option value="无">无</option>
+                                    <option value="老学员">老学员</option>
+                                    <option value="老学员推荐">老学员推荐</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="label">推荐的老学员姓名</label>
+                                <input class="input" placeholder="如享受老学员推荐优惠，请填写推荐人姓名" id="referrerName" />
                             </div>
                         </div>
                         
-                        <div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 20px; background: white; border-top: 1px solid #eee;">
-                            <button class="submit-btn" onclick="submitForm()">提交报名信息</button>
+                        <div class="footer" style="margin-top: 30px;">
+                            <div class="action-buttons">
+                                <button class="btn secondary" onclick="alert('确定要取消报名吗？')">取消报名</button>
+                                <button class="btn primary" onclick="submitForm()">提交报名信息</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报名状态页 - pages/registration-status/registration-status.js -->
+                <div id="registration-status" class="page">
+                    <div class="container">
+                        <div class="header">
+                            <div class="status-icon success" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; margin: 0 auto 20px; background: #52c41a; color: white;">✓</div>
+                            <div class="title">报名成功</div>
+                        </div>
+                        
+                        <div class="status-card">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="color: #666; line-height: 1.6;">恭喜您！报名信息已提交成功，请在10分钟内上传缴费截图完成报名流程。</div>
+                            </div>
+                            
+                            <div style="background: #f0f8f0; border-radius: 8px; padding: 20px; margin: 20px 0; border: 2px solid #52c41a;">
+                                <div style="text-align: center;">
+                                    <span style="color: #333; margin-right: 10px;">剩余时间：</span>
+                                    <span style="font-size: 24px; font-weight: bold; color: #52c41a;">09:59</span>
+                                </div>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; text-align: left;">
+                                <div style="font-weight: bold; color: #333; margin-bottom: 10px;">温馨提示：</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 5px;">• 请及时上传清晰的缴费截图</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 5px;">• 超时未上传将自动释放名额</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.5;">• 如有问题请联系客服</div>
+                            </div>
+                        </div>
+                        
+                        <div class="footer">
+                            <button class="btn primary" onclick="showNextPage('payment-upload')">上传缴费截图</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报名失败页 - pages/registration-failed/registration-failed.js -->
+                <div id="registration-failed" class="page">
+                    <div class="container">
+                        <div class="header">
+                            <div class="status-icon failed" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; margin: 0 auto 20px; background: #ff4d4f; color: white;">✗</div>
+                            <div class="title">报名失败</div>
+                        </div>
+                        
+                        <div class="status-card">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="color: #666; line-height: 1.6; margin-bottom: 30px;">很抱歉，该岗位已有其他考生完成缴费，名额已满。您的信息未录入系统。</div>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; text-align: center;">
+                                <div style="color: #666; font-size: 14px; line-height: 1.5;">感谢您选择大鹏，如有疑问可联系客服了解更多信息。</div>
+                            </div>
+                        </div>
+                        
+                        <div class="footer">
+                            <button class="btn secondary" onclick="alert('即将关闭小程序')">关闭小程序</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报名排队页 - pages/registration-queue/registration-queue.js -->
+                <div id="registration-queue" class="page">
+                    <div class="container">
+                        <div class="header">
+                            <div class="status-icon waiting" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; margin: 0 auto 20px; background: #faad14; color: white;">⏳</div>
+                            <div class="title">名额暂满</div>
+                        </div>
+                        
+                        <div class="status-card">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="color: #666; line-height: 1.6; margin-bottom: 30px;">该岗位已有其他考生报名但尚未完成缴费，若对方未在规定时间内完成缴费，名额将自动释放。</div>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; text-align: left;">
+                                <div style="font-weight: bold; color: #333; margin-bottom: 15px;">您可以选择：</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 5px;">• 加入排队等待，名额释放时通知您重新报名</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.5;">• 取消报名，选择其他机构</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn primary" onclick="alert('已加入排队等待')">等待报名，加入排队</button>
+                            <button class="btn secondary" onclick="alert('已取消报名')">取消报名</button>
                         </div>
                     </div>
                 </div>
@@ -901,15 +1051,6 @@
                                 <span class="info-value amount">¥298.00</span>
                             </div>
                             <div class="payment-row">
-                                <div class="payment-item">
-                                    <span class="payment-label">支付方式：</span>
-                                    <select class="payment-picker" id="paymentMethod">
-                                        <option value="">请选择</option>
-                                        <option value="tenpay">财付通</option>
-                                        <option value="alipay">支付宝</option>
-                                        <option value="bankcard">银行卡</option>
-                                    </select>
-                                </div>
                                 <div class="payment-item">
                                     <span class="payment-label">收款账户：</span>
                                     <div style="display: flex; align-items: center; gap: 6px;">
@@ -940,13 +1081,13 @@
                         
                         <div class="info-card">
                             <div style="font-weight: bold; margin-bottom: 10px; color: #0277bd;">上传说明</div>
-                            <div class="step">• 请确保截图清晰完整，包含支付金额和时间</div>
-                            <div class="step">• 上传后请仔细检查图片是否清晰可见</div>
-                            <div class="step">• 缴费凭证将作为报名审核的重要依据</div>
+                            <div class="step" style="font-size: 13px;">• 请确保截图清晰完整，包含支付金额和时间</div>
+                            <div class="step" style="font-size: 13px;">• 上传后请仔细检查图片是否清晰可见</div>
+                            <div class="step" style="font-size: 13px;">• 缴费凭证将作为报名审核的重要依据</div>
                         </div>
                         
-                        <div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 20px; background: white; border-top: 1px solid #eee;">
-                            <button class="btn" id="finalSubmit" onclick="submitPayment()" disabled style="background: #52c41a; color: white;">完成报名提交</button>
+                        <div class="footer" style="margin-top: 30px;">
+                            <button class="btn" id="finalSubmit" onclick="submitPayment()" disabled style="background: #52c41a; color: white;">提交截图</button>
                         </div>
                     </div>
                 </div>
@@ -1013,6 +1154,50 @@
                         
                         <div style="background: #fff7e6; border-radius: 6px; padding: 10px; border: 1px solid #ffd591;">
                             <div style="font-size: 12px; color: #d46b08; text-align: center;">温馨提示：请妥善保存报名编号，后续查询时需要使用</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 审核通过页 - pages/approval-result/approval-result.js -->
+                <div id="approval-result" class="page">
+                    <div class="container">
+                        <div class="header">
+                            <div class="status-icon success" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; margin: 0 auto 20px; background: #52c41a; color: white;">✓</div>
+                            <div class="title" style="font-size: 20px;">审核通过</div>
+                        </div>
+                        
+                        <div class="success-card">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="color: #666; line-height: 1.6; margin-bottom: 30px;">您的报名申请已通过审核，请添加课程顾问微信获取后续学习资料和课程安排。</div>
+                            </div>
+                            
+                            <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                                <div style="font-weight: bold; color: #333; margin-bottom: 15px;">扫码添加课程顾问</div>
+                                <div style="width: 200px; height: 200px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                    <div style="text-align: center; color: #666;">
+                                        <div style="font-size: 40px; margin-bottom: 10px;">📱</div>
+                                        <div style="font-size: 14px;">课程顾问二维码</div>
+                                    </div>
+                                </div>
+                                <div style="font-size: 12px; color: #999;">长按识别二维码或截图保存</div>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; text-align: left;">
+                                <div style="font-weight: bold; color: #333; margin-bottom: 15px;">联系方式</div>
+                                <div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                                    <span style="color: #666; width: 60px; font-size: 11px;">微信号：</span>
+                                    <span style="flex: 1; color: #333; font-size: 11px;">course_advisor_2024</span>
+                                    <button class="copy-btn" onclick="copyText('course_advisor_2024', '微信号已复制')" style="background: #007aff; color: white; font-size: 10px; padding: 4px 12px; border-radius: 12px; border: none; margin-left: 10px;">复制</button>
+                                </div>
+                                <div style="display: flex; align-items: center; padding: 10px 0;">
+                                    <span style="color: #666; width: 60px; font-size: 11px;">工作时间：</span>
+                                    <span style="flex: 1; color: #333; font-size: 11px;">周一至周日 9:00-18:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="footer">
+                            <button class="btn primary" onclick="showPage('index')">返回首页</button>
                         </div>
                     </div>
                 </div>
@@ -1456,6 +1641,29 @@
             
             // 跳转到岗位保护查询页
             showPage('position-check');
+        }
+        
+        // 通用复制文本功能
+        function copyText(text, successMessage) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert(successMessage || '已复制');
+                }).catch(() => {
+                    fallbackCopy(text, successMessage);
+                });
+            } else {
+                fallbackCopy(text, successMessage);
+            }
+        }
+        
+        function fallbackCopy(text, successMessage) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert(successMessage || '已复制');
         }
         
         // 初始化页面

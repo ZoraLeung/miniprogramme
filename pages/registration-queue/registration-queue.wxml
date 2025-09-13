@@ -1,0 +1,28 @@
+<!--registration-queue.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="status-icon waiting">⏳</view>
+    <text class="title">名额暂满</text>
+    <text class="subtitle">可选择排队等待</text>
+  </view>
+  
+  <view class="main">
+    <view class="status-card">
+      <view class="card-content">
+        <text class="card-title">⏳ 名额暂满</text>
+        <text class="card-message">该岗位已有其他考生报名但尚未完成缴费，若对方未在规定时间内完成缴费，名额将自动释放。</text>
+        
+        <view class="waiting-section">
+          <text class="waiting-title">您可以选择：</text>
+          <text class="waiting-text">• 加入排队等待，名额释放时自动为您报名</text>
+          <text class="waiting-text">• 取消报名，选择其他岗位</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="footer">
+    <button class="primary-btn" bindtap="joinQueue">等待报名，加入排队</button>
+    <button class="secondary-btn" bindtap="cancelRegistration">取消报名</button>
+  </view>
+</view>

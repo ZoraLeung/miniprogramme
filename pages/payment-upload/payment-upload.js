@@ -3,8 +3,7 @@ Page({
   data: {
     paymentInfo: {
       amount: '298.00',
-      method: '微信支付/支付宝',
-      account: 'xxxxx@example.com'
+      account: '招商银行 6214 8320 2243 7987（梁卓然）'
     },
     uploadedImage: '',
     imageUploaded: false
@@ -12,6 +11,27 @@ Page({
 
   onLoad: function (options) {
     
+  },
+
+  // 复制银行卡账号
+  copyAccount: function() {
+    const accountNumber = '6214832022437987';  // 纯数字账号
+    wx.setClipboardData({
+      data: accountNumber,
+      success: function () {
+        wx.showToast({
+          title: '账号已复制',
+          icon: 'success',
+          duration: 2000
+        });
+      },
+      fail: function () {
+        wx.showToast({
+          title: '复制失败',
+          icon: 'none'
+        });
+      }
+    });
   },
 
   chooseImage: function() {

@@ -1,0 +1,28 @@
+<!--registration-failed.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="status-icon failed">✗</view>
+    <text class="title">报名失败</text>
+    <text class="subtitle">名额已满</text>
+  </view>
+  
+  <view class="main">
+    <view class="status-card">
+      <view class="card-content">
+        <text class="card-title">😔 报名失败</text>
+        <text class="card-message">很抱歉，该岗位已有其他考生完成缴费，名额已满。您的信息未录入系统。</text>
+        
+        <view class="suggestion-section">
+          <text class="suggestion-title">建议您：</text>
+          <text class="suggestion-text">• 关注其他相关岗位</text>
+          <text class="suggestion-text">• 等待下一期报名开放</text>
+          <text class="suggestion-text">• 联系客服了解更多信息</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="footer">
+    <button class="secondary-btn" bindtap="closeApp">关闭小程序</button>
+  </view>
+</view>

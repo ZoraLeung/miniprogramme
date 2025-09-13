@@ -55,6 +55,13 @@ Page({
     });
   },
 
+  // 查看审核结果
+  checkApprovalResult: function() {
+    wx.navigateTo({
+      url: '/pages/approval-result/approval-result?id=' + this.data.registrationId
+    });
+  },
+
   onShareAppMessage: function() {
     return {
       title: '我刚刚完成了报名，快来看看吧！',

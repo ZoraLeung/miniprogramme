@@ -1,0 +1,76 @@
+<!--registration-status.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="status-icon {{statusClass}}">{{statusIcon}}</view>
+    <text class="title">{{statusTitle}}</text>
+  </view>
+  
+  <view class="main">
+    <!-- 状态一：报名成功 -->
+    <view class="status-card" wx:if="{{status === 'success'}}">
+      <view class="card-content">
+        <text class="card-title">🎉 报名成功</text>
+        <text class="card-message">恭喜您！报名信息已提交成功，请在10分钟内上传缴费截图完成报名流程。</text>
+        
+        <view class="countdown-section">
+          <text class="countdown-label">剩余时间：</text>
+          <text class="countdown-time">{{countdownTime}}</text>
+        </view>
+        
+        <view class="tips-section">
+          <text class="tips-title">温馨提示：</text>
+          <text class="tips-text">• 请及时上传清晰的缴费截图</text>
+          <text class="tips-text">• 超时未上传将自动释放名额</text>
+          <text class="tips-text">• 如有问题请联系客服</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 状态二：报名失败 - 已有同岗完成缴费 -->
+    <view class="status-card" wx:elif="{{status === 'failed_completed'}}">
+      <view class="card-content">
+        <text class="card-title">😔 报名失败</text>
+        <text class="card-message">很抱歉，该岗位已有其他考生完成缴费，名额已满。您的信息未录入系统。</text>
+        
+        <view class="suggestion-section">
+          <text class="suggestion-title">建议您：</text>
+          <text class="suggestion-text">• 关注其他相关岗位</text>
+          <text class="suggestion-text">• 等待下一期报名开放</text>
+          <text class="suggestion-text">• 联系客服了解更多信息</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 状态三：报名失败 - 有同岗报名但未缴费 -->
+    <view class="status-card" wx:else>
+      <view class="card-content">
+        <text class="card-title">⏳ 名额暂满</text>
+        <text class="card-message">该岗位已有其他考生报名但尚未完成缴费，若对方未在规定时间内完成缴费，名额将自动释放。</text>
+        
+        <view class="waiting-section">
+          <text class="waiting-title">您可以选择：</text>
+          <text class="waiting-text">• 加入排队等待，名额释放时自动为您报名</text>
+          <text class="waiting-text">• 取消报名，选择其他岗位</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="footer">
+    <!-- 成功状态的按钮 -->
+    <view wx:if="{{status === 'success'}}">
+      <button class="primary-btn" bindtap="goToPayment">上传缴费截图</button>
+    </view>
+    
+    <!-- 失败状态（已完成缴费）的按钮 -->
+    <view wx:elif="{{status === 'failed_completed'}}">
+      <button class="secondary-btn" bindtap="closeApp">关闭小程序</button>
+    </view>
+    
+    <!-- 等待状态的按钮 -->
+    <view wx:else>
+      <button class="primary-btn" bindtap="joinQueue">等待报名，加入排队</button>
+      <button class="secondary-btn" bindtap="cancelRegistration">取消报名</button>
+    </view>
+  </view>
+</view>

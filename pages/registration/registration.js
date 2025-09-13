@@ -115,8 +115,9 @@ Page({
       submitTime: new Date().toISOString()
     });
     
+    // 跳转到报名状态页面
     wx.navigateTo({
-      url: '/pages/payment-upload/payment-upload'
+      url: '/pages/registration-status/registration-status'
     });
   }
 })

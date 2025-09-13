@@ -1,0 +1,63 @@
+<!--approval-result.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="status-icon success" wx:if="{{approvalStatus === 'approved'}}">✓</view>
+    <view class="status-icon pending" wx:elif="{{approvalStatus === 'pending'}}">⏳</view>
+    <view class="status-icon rejected" wx:else>✗</view>
+    
+    <text class="title">{{statusTitle}}</text>
+  </view>
+  
+  <view class="main" wx:if="{{approvalStatus === 'approved'}}">
+    <view class="success-card">
+      <text class="card-title">恭喜！审核通过</text>
+      <text class="card-message">您的报名申请已通过审核，请添加课程顾问微信获取后续学习资料和课程安排。</text>
+      
+      <view class="qr-section">
+        <text class="qr-title">扫码添加课程顾问</text>
+        <image class="qr-code" src="/images/advisor-qrcode.png" mode="aspectFit"></image>
+        <text class="qr-tips">长按识别二维码或截图保存</text>
+      </view>
+      
+      <view class="contact-info">
+        <text class="contact-title">联系方式</text>
+        <view class="contact-item">
+          <text class="contact-label">微信号：</text>
+          <text class="contact-value">course_advisor_2024</text>
+          <button class="copy-contact-btn" bindtap="copyWechatId">复制</button>
+        </view>
+        <view class="contact-item">
+          <text class="contact-label">工作时间：</text>
+          <text class="contact-value">周一至周日 9:00-18:00</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="main" wx:elif="{{approvalStatus === 'pending'}}">
+    <view class="info-card">
+      <text class="card-title">审核中</text>
+      <text class="card-message">您的报名申请正在审核中，预计1-3个工作日内完成，请耐心等待。审核结果将通过微信通知您。</text>
+    </view>
+  </view>
+  
+  <view class="main" wx:else>
+    <view class="info-card">
+      <text class="card-title">审核未通过</text>
+      <text class="card-message">很抱歉，您的报名申请未通过审核。如有疑问，请联系客服咨询具体原因。</text>
+    </view>
+  </view>
+  
+  <view class="footer">
+    <button class="primary-btn" bindtap="backToHome" wx:if="{{approvalStatus === 'approved'}}">
+      返回首页
+    </button>
+    <button class="primary-btn" bindtap="checkAgain" wx:elif="{{approvalStatus === 'pending'}}">
+      刷新状态
+    </button>
+    <view wx:else>
+      <button class="secondary-btn" bindtap="contactService">联系客服</button>
+      <button class="primary-btn" bindtap="backToHome">返回首页</button>
+    </view>
+  </view>
+</view>

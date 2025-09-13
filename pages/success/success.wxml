@@ -53,8 +53,9 @@
   </view>
   
   <view class="action-buttons">
+    <button class="btn primary" bindtap="checkApprovalResult">查看审核结果</button>
     <button class="btn secondary" bindtap="contactService">联系客服</button>
-    <button class="btn primary" bindtap="backToHome">返回首页</button>
+    <button class="btn outline" bindtap="backToHome">返回首页</button>
   </view>
   
   <view class="tips">

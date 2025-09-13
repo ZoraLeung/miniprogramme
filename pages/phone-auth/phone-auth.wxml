@@ -1,0 +1,30 @@
+<!--phone-auth.wxml-->
+<view class="container">
+  <view class="header">
+    <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+    <text class="title">手机号授权</text>
+    <text class="subtitle">请授权获取您的手机号用于报名</text>
+  </view>
+  
+  <view class="main">
+    <view class="info-card">
+      <view class="auth-icon">📱</view>
+      <text class="info-title">为什么需要手机号？</text>
+      <view class="reasons">
+        <view class="reason">• 用于报名信息确认和通知</view>
+        <view class="reason">• 保障您的报名权益</view>
+        <view class="reason">• 重要通知及时推送</view>
+      </view>
+      <text class="privacy-note">我们承诺严格保护您的隐私信息</text>
+    </view>
+  </view>
+  
+  <view class="footer">
+    <button class="auth-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
+      授权手机号
+    </button>
+    <view class="warning-text">
+      <text class="warning-message">⚠️ 不完成授权无法进行查询或报名</text>
+    </view>
+  </view>
+</view>

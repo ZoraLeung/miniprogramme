@@ -10,7 +10,7 @@ Page({
 
   startRegistration: function() {
     wx.navigateTo({
-      url: '/pages/position-check/position-check'
+      url: '/pages/phone-auth/phone-auth'
     })
   }
 })

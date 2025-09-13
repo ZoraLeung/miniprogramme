@@ -1,12 +1,17 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/phone-auth/phone-auth",
     "pages/position-check/position-check",
     "pages/blacklist-verify/blacklist-verify", 
     "pages/notice/notice",
     "pages/registration/registration",
+    "pages/registration-status/registration-status",
+    "pages/registration-failed/registration-failed",
+    "pages/registration-queue/registration-queue",
     "pages/payment-upload/payment-upload",
-    "pages/success/success"
+    "pages/success/success",
+    "pages/approval-result/approval-result"
   ],
   "window": {
     "backgroundTextStyle": "light",

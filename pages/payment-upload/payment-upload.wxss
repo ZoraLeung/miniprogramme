@@ -48,6 +48,16 @@
   border-bottom: 1rpx solid #f0f0f0;
 }
 
+.copy-btn {
+  background: #007aff;
+  color: white;
+  font-size: 24rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 30rpx;
+  border: none;
+  margin-left: 20rpx;
+}
+
 .info-item:last-child {
   border-bottom: none;
 }

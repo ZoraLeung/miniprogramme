@@ -1,0 +1,104 @@
+/* phone-auth.wxss */
+.container {
+  padding: 40rpx;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.logo {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.main {
+  flex: 1;
+}
+
+.info-card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.auth-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.info-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30rpx;
+  display: block;
+}
+
+.reasons {
+  text-align: left;
+  margin-bottom: 30rpx;
+}
+
+.reason {
+  padding: 15rpx 0;
+  color: #666;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+.privacy-note {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.4;
+}
+
+.footer {
+  margin-top: 60rpx;
+}
+
+.auth-btn {
+  background: #07c160;
+  color: white;
+  border-radius: 50rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 32rpx;
+  margin-bottom: 30rpx;
+}
+
+.auth-btn:hover {
+  background: #06a050;
+}
+
+.warning-text {
+  text-align: center;
+  margin-top: 20rpx;
+}
+
+.warning-message {
+  color: #ff4d4f;
+  font-size: 24rpx;
+  line-height: 1.4;
+}

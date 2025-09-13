@@ -12,12 +12,9 @@
       <text class="info-value amount">¥{{paymentInfo.amount}}</text>
     </view>
     <view class="info-item">
-      <text class="info-label">支付方式：</text>
-      <text class="info-value">{{paymentInfo.method}}</text>
-    </view>
-    <view class="info-item">
       <text class="info-label">收款账户：</text>
       <text class="info-value">{{paymentInfo.account}}</text>
+      <button class="copy-btn" bindtap="copyAccount">复制账号</button>
     </view>
   </view>
   
