@@ -575,6 +575,56 @@
             font-weight: 500;
         }
         
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 20px;
+            margin: 20px;
+            max-width: 280px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .modal-btn {
+            width: 100%;
+            height: 40px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .modal-btn:hover {
+            background: #0056cc;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
         /* 隐藏非当前页面 */
         .page {
             display: none;
@@ -754,9 +804,8 @@
                         
                         <div class="info-card">
                             <div class="title">温馨提示</div>
-                            <div class="step">• 岗位代码查询是必要步骤，请如实填写</div>
-                            <div class="step">• 系统将自动检查您的报名资格</div>
-                            <div class="step">• 如有疑问，请联系管理员</div>
+                            <div class="step">• 岗位代码查询是必要步骤，请直接复制职位表的代码，避免填错</div>
+                            <div class="step">• 系统将自动检查您的报名资格（即是否已有同岗报名）</div>
                         </div>
                     </div>
                 </div>
@@ -813,33 +862,58 @@
 1. 岗位保护说明
    • 本次面试招生采用1：1岗位保护，即岗位招聘人数为机构最多招收学员人数。例如，若某岗位招聘3人，我们该岗位最多招收3名学员。
 
-2. 学费缴纳要求  
+2. 填写注意事项
+   • 填写过程中请仔细校对岗位名称和大中小围的判断，否则会影响报名结果。
+   其中对大中小围系统判断的逻辑如下：
+   
+   招录人数≤3
+   笔试排名≤3👉小围
+   4≤笔试排名≤6👉中围
+   7≤笔试排名≤9👉大围
+
+   招录4人
+   笔试排名≤3👉小围
+   4≤笔试排名≤6👉中围
+   7≤笔试排名≤10👉大围
+
+   招录5人
+   笔试排名≤4👉小围
+   5≤笔试排名≤8👉中围
+   9≤笔试排名≤12👉大围
+
+3. 学费缴纳要求  
    • 报名协议班的学员需要在收到体检通知的两个自然日内补齐剩余学费，包含补录的学员。
 
-3. 师资安排
+4. 师资安排
    • 本次课程不支持指定以及更换老师。
    • 师生比不超过1:12
 
-4. 退款方案
+5. 退款方案
    • 退款方案（需讨论）
 
-5. 住宿说明
-   • 报名课程附赠线下课程对应天数的住宿及次日早餐，住宿默认同性双人间。有需要入住单人间的同学，联系客服补差价。不住宿不退差价。
-
-6. 协议条款
-   • <span style="color: #007aff; text-decoration: underline;">《协议班协议》</span>
-   • <span style="color: #007aff; text-decoration: underline;">《非协议班协议》</span></div>
+6. 住宿说明
+   • 报名课程附赠线下课程对应天数的住宿及次日早餐，住宿默认同性双人间。有需要入住单人间的同学，联系客服补差价。不住宿不退差价。</div>
                             </div>
                         </div>
                         
                         <div class="agreement">
-                            <label class="agreement-item">
+                            <div class="agreement-item" style="margin-bottom: 15px;">
+                                <input type="radio" name="agreementType" id="agreement1" onchange="checkAllAgreements()">
+                                <span class="agreement-text" style="margin-left: 10px; color: #007aff; text-decoration: underline;">《协议班协议》</span>
+                                <span style="margin-left: 10px; color: #333; font-size: 13px;">我已阅读</span>
+                            </div>
+                            <div class="agreement-item" style="margin-bottom: 15px;">
+                                <input type="radio" name="agreementType" id="agreement2" onchange="checkAllAgreements()">
+                                <span class="agreement-text" style="margin-left: 10px; color: #007aff; text-decoration: underline;">《非协议班协议》</span>
+                                <span style="margin-left: 10px; color: #333; font-size: 13px;">我已阅读</span>
+                            </div>
+                            <div class="agreement-item">
                                 <input type="checkbox" id="agreeCheckbox" onchange="checkAgreement()" disabled>
                                 <span class="agreement-text" id="agreeText" style="color: #ccc;">我已仔细阅读并同意以上报名须知</span>
-                            </label>
+                            </div>
                         </div>
                         
-                        <button class="continue-btn" id="noticeContinue" onclick="showPage('registration')" disabled>继续填写报名信息</button>
+                        <button class="continue-btn" id="noticeContinue" onclick="showRiskWarning()" disabled>继续填写报名信息</button>
                         
                         <div id="scrollTip" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px;">
                             请滑动到底部阅读完整内容
@@ -872,20 +946,35 @@
                                 <label class="label">电话号码 <span class="required">*</span></label>
                                 <input class="input" placeholder="已从授权获取，可修改" type="tel" maxlength="11" id="userPhone" />
                             </div>
+                            
+                            <div class="form-group">
+                                <label class="label">身份证正面 <span class="required">*</span></label>
+                                <div class="upload-area" id="idCardUploadArea" onclick="selectIdCard()" style="border: 2px dashed #d9d9d9; border-radius: 6px; padding: 40px 10px; text-align: center; background: #fafafa; cursor: pointer; margin-bottom: 15px;">
+                                    <div style="font-size: 24px; margin-bottom: 10px;">📄</div>
+                                    <div class="upload-text">点击上传身份证正面</div>
+                                    <div class="upload-tip">支持JPG、PNG格式，大小不超过5MB</div>
+                                </div>
+                                <div id="idCardPreview" style="display: none; text-align: center;">
+                                    <img id="idCardImg" style="max-width: 150px; max-height: 100px; border-radius: 6px; margin-bottom: 15px;">
+                                    <div>
+                                        <button class="btn" style="background: #007aff; color: white; width: auto; padding: 8px 16px; margin-right: 10px;" onclick="previewIdCard()">预览</button>
+                                        <button class="btn" style="background: #ff4d4f; color: white; width: auto; padding: 8px 16px;" onclick="deleteIdCard()">删除</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="form-card">
                             <div style="font-size: 15px; font-weight: bold; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">岗位信息</div>
                             
                             <div class="form-group">
-                                <label class="label">岗位名称 <span class="required">*</span></label>
-                                <select class="picker" id="positionName">
-                                    <option value="">请选择岗位</option>
-                                    <option value="岗位A">岗位A</option>
-                                    <option value="岗位B">岗位B</option>
-                                    <option value="岗位C">岗位C</option>
-                                    <option value="岗位D">岗位D</option>
-                                </select>
+                                <label class="label">岗位代码 <span class="required">*</span></label>
+                                <input class="input" placeholder="请输入岗位代码" id="positionCode" onchange="matchPositionName()" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="label">岗位名称</label>
+                                <input class="input" disabled value="请先输入岗位代码" style="background: #f5f5f5; color: #999;" id="positionNameDisplay" />
                             </div>
                             
                             <div class="form-group">
@@ -896,6 +985,22 @@
                             <div class="form-group">
                                 <label class="label">笔试排名 <span class="required">*</span></label>
                                 <input class="input" placeholder="请输入笔试排名" type="number" id="examRank" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="label">笔试成绩截图 <span class="required">*</span></label>
+                                <div class="upload-area" id="examScoreUploadArea" onclick="selectExamScore()" style="border: 2px dashed #d9d9d9; border-radius: 6px; padding: 40px 10px; text-align: center; background: #fafafa; cursor: pointer; margin-bottom: 15px;">
+                                    <div style="font-size: 24px; margin-bottom: 10px;">📊</div>
+                                    <div class="upload-text">点击上传笔试成绩截图</div>
+                                    <div class="upload-tip">支持JPG、PNG格式，大小不超过5MB</div>
+                                </div>
+                                <div id="examScorePreview" style="display: none; text-align: center;">
+                                    <img id="examScoreImg" style="max-width: 150px; max-height: 100px; border-radius: 6px; margin-bottom: 15px;">
+                                    <div>
+                                        <button class="btn" style="background: #007aff; color: white; width: auto; padding: 8px 16px; margin-right: 10px;" onclick="previewExamScore()">预览</button>
+                                        <button class="btn" style="background: #ff4d4f; color: white; width: auto; padding: 8px 16px;" onclick="deleteExamScore()">删除</button>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="form-group">
@@ -944,7 +1049,7 @@
                         
                         <div class="footer" style="margin-top: 30px;">
                             <div class="action-buttons">
-                                <button class="btn secondary" onclick="alert('确定要取消报名吗？')">取消报名</button>
+                                <button class="btn secondary" onclick="showCancelConfirm()">取消报名</button>
                                 <button class="btn primary" onclick="submitForm()">提交报名信息</button>
                             </div>
                         </div>
@@ -962,6 +1067,37 @@
                         <div class="status-card">
                             <div style="text-align: center; margin-bottom: 30px;">
                                 <div style="color: #666; line-height: 1.6;">恭喜您！报名信息已提交成功，请在10分钟内上传缴费截图完成报名流程。</div>
+                            </div>
+                            
+                            <!-- 报名信息显示 -->
+                            <div style="background: white; border: 1px solid #e5e5e5; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: left;">
+                                <div style="font-size: 14px; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center;">报名信息</div>
+                                <div class="info-item">
+                                    <span class="info-label">所选班型：</span>
+                                    <span class="info-value" id="registrationCourseType">14天系统班</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">协议/非协议：</span>
+                                    <span class="info-value" id="registrationAgreementType">协议班</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">大中小围：</span>
+                                    <span class="info-value" id="registrationCircleType">小围</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">应缴费用：</span>
+                                    <span class="info-value amount">¥1000.00</span>
+                                </div>
+                                <div class="info-item" style="align-items: center;">
+                                    <span style="font-size: 12px; color: #666; min-width: 60px; flex-shrink: 0;">收款账户：</span>
+                                    <div style="display: flex; flex-direction: column; flex: 1; gap: 2px;">
+                                        <div style="font-size: 12px; color: #333; font-weight: 500;">招商银行</div>
+                                        <div style="font-size: 14px; color: #333; font-weight: 500;">6214832022437987-梁卓然</div>
+                                        <div style="margin-top: 5px;">
+                                            <button class="copy-btn" style="font-size: 10px; padding: 2px 12px; min-width: 40px;" onclick="copyRegistrationBankAccount()">复制</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div style="background: #f0f8f0; border-radius: 8px; padding: 20px; margin: 20px 0; border: 2px solid #52c41a;">
@@ -995,11 +1131,11 @@
                         
                         <div class="status-card">
                             <div style="text-align: center; margin-bottom: 30px;">
-                                <div style="color: #666; line-height: 1.6; margin-bottom: 30px;">很抱歉，该岗位已有其他考生完成缴费，名额已满。您的信息未录入系统。</div>
+                                <div style="color: #666; line-height: 1.6; margin-bottom: 30px;">很抱歉，该岗位已有同岗报名并完成缴费，按照岗位保护原则，不再接受超1：1比例同岗人员报名。您的信息未录入系统。</div>
                             </div>
                             
                             <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; text-align: center;">
-                                <div style="color: #666; font-size: 14px; line-height: 1.5;">感谢您选择大鹏，如有疑问可联系客服了解更多信息。</div>
+                                <div style="color: #666; font-size: 14px; line-height: 1.5;">感谢您选择大鹏，如有疑问，可联系客服了解更多信息。</div>
                             </div>
                         </div>
                         
@@ -1045,17 +1181,30 @@
                         </div>
                         
                         <div class="payment-info">
-                            <div style="font-weight: bold; margin-bottom: 15px;">缴费信息</div>
+                            <div style="font-size: 14px; font-weight: bold; color: #333; margin-bottom: 15px; text-align: center;">缴费信息</div>
                             <div class="info-item">
-                                <span class="info-label">报名费用：</span>
-                                <span class="info-value amount">¥298.00</span>
+                                <span class="info-label">所选班型：</span>
+                                <span class="info-value" id="paymentCourseType">14天系统班</span>
                             </div>
-                            <div class="payment-row">
-                                <div class="payment-item">
-                                    <span class="payment-label">收款账户：</span>
-                                    <div style="display: flex; align-items: center; gap: 6px;">
-                                        <span class="payment-value" id="accountNumber">招商银行 6214 8320 2243 7987（梁卓然）</span>
-                                        <button class="copy-btn" onclick="copyBankAccount()">复制</button>
+                            <div class="info-item">
+                                <span class="info-label">协议/非协议：</span>
+                                <span class="info-value" id="paymentAgreementType">协议班</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">大中小围：</span>
+                                <span class="info-value" id="paymentCircleType">小围</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">应缴费用：</span>
+                                <span class="info-value amount">¥1000.00</span>
+                            </div>
+                            <div class="info-item" style="align-items: center;">
+                                <span style="font-size: 12px; color: #666; min-width: 60px; flex-shrink: 0;">收款账户：</span>
+                                <div style="display: flex; flex-direction: column; flex: 1; gap: 2px;">
+                                    <div style="font-size: 12px; color: #333; font-weight: 500;">招商银行</div>
+                                    <div style="font-size: 14px; color: #333; font-weight: 500;">6214832022437987-梁卓然</div>
+                                    <div style="margin-top: 5px;">
+                                        <button class="copy-btn" style="font-size: 10px; padding: 2px 12px; min-width: 40px;" onclick="copyBankAccount()">复制</button>
                                     </div>
                                 </div>
                             </div>
@@ -1202,10 +1351,39 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 弹窗 -->
+            <div id="positionModal" class="modal-overlay hidden">
+                <div class="modal-content">
+                    <div class="modal-title">当前暂无同岗报名，请点击阅读报名</div>
+                    <button class="modal-btn" onclick="closeModalAndGoToNotice()">阅读报名须知</button>
+                </div>
+            </div>
+            
+            <!-- 风险提示弹窗 -->
+            <div id="riskWarningModal" class="modal-overlay hidden">
+                <div class="modal-content" style="max-width: 320px;">
+                    <div class="modal-title" style="line-height: 1.6; margin-bottom: 25px;">现在已有同岗或填写报名信息期间可能有同岗在同时进行报名，如对方先缴费成功则无法提交报名信息，报名失败时系统不会储存用户信息，若同意则进入信息填报页面。</div>
+                    <div class="action-buttons">
+                        <button class="btn secondary" onclick="closeRiskWarningModal()">退出</button>
+                        <button class="btn primary" onclick="agreeAndProceed()">同意</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 取消报名确认弹窗 -->
+            <div id="cancelConfirmModal" class="modal-overlay hidden">
+                <div class="modal-content">
+                    <div class="modal-title">您的信息未录入系统，请知悉。</div>
+                    <button class="modal-btn" onclick="closeCancelConfirmModal()">我已知晓</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+    <input type="file" id="idCardInput" accept="image/*" style="display: none;" onchange="handleIdCardSelect(event)">
+    <input type="file" id="examScoreInput" accept="image/*" style="display: none;" onchange="handleExamScoreSelect(event)">
 
     <script>
         let currentPage = 'index';
@@ -1282,21 +1460,45 @@
                 return;
             }
             
-            const queryBtn = document.getElementById('queryBtn');
-            const verifyingSection = document.getElementById('verifyingSection');
-            const resultDiv = document.getElementById('queryResult');
-            
-            // 隐藏之前可能显示的结果
-            resultDiv.style.display = 'none';
-            
-            // 显示验证动效区域
-            verifyingSection.style.display = 'block';
-            
-            queryBtn.textContent = '查询中...';
-            queryBtn.disabled = true;
-            
-            // 开始进度动画
-            startPositionVerification();
+            // 直接显示弹窗
+            showPositionModal();
+        }
+        
+        // 显示弹窗
+        function showPositionModal() {
+            document.getElementById('positionModal').classList.remove('hidden');
+        }
+        
+        // 关闭弹窗并跳转到报名须知页面
+        function closeModalAndGoToNotice() {
+            document.getElementById('positionModal').classList.add('hidden');
+            showPage('notice');
+        }
+        
+        // 显示风险提示弹窗
+        function showRiskWarning() {
+            document.getElementById('riskWarningModal').classList.remove('hidden');
+        }
+        
+        // 关闭风险提示弹窗
+        function closeRiskWarningModal() {
+            document.getElementById('riskWarningModal').classList.add('hidden');
+        }
+        
+        // 同意风险提示并进入报名信息页面
+        function agreeAndProceed() {
+            document.getElementById('riskWarningModal').classList.add('hidden');
+            showPage('registration');
+        }
+        
+        // 显示取消报名确认弹窗
+        function showCancelConfirm() {
+            document.getElementById('cancelConfirmModal').classList.remove('hidden');
+        }
+        
+        // 关闭取消报名确认弹窗
+        function closeCancelConfirmModal() {
+            document.getElementById('cancelConfirmModal').classList.add('hidden');
         }
         
         function startPositionVerification() {
@@ -1441,8 +1643,9 @@
             if (noticeContent.scrollTop + noticeContent.clientHeight >= noticeContent.scrollHeight - 10) {
                 hasReadNotice = true;
                 scrollTip.style.display = 'none';
-                agreeCheckbox.disabled = false;
-                agreeText.style.color = '#333';
+                
+                // 滑动到底部后，再次检查协议选择状态
+                checkAllAgreements();
             }
         }
         
@@ -1462,12 +1665,130 @@
         
         function checkAgreement() {
             const agreeCheckbox = document.getElementById('agreeCheckbox');
-            const continueBtn = document.getElementById('noticeontinue');
+            const continueBtn = document.getElementById('noticeContinue');
             
             continueBtn.disabled = !agreeCheckbox.checked;
         }
         
-        // 表单验证和提交
+        function checkAllAgreements() {
+            const agreement1 = document.getElementById('agreement1');
+            const agreement2 = document.getElementById('agreement2');
+            const agreeCheckbox = document.getElementById('agreeCheckbox');
+            const agreeText = document.getElementById('agreeText');
+            
+            // 检查是否选择了其中一个协议且已滑动到底部
+            if ((agreement1.checked || agreement2.checked) && hasReadNotice) {
+                agreeCheckbox.disabled = false;
+                agreeText.style.color = '#333';
+            } else {
+                agreeCheckbox.disabled = true;
+                agreeCheckbox.checked = false;
+                agreeText.style.color = '#ccc';
+                const continueBtn = document.getElementById('noticeContinue');
+                continueBtn.disabled = true;
+            }
+        }
+        
+        // 岗位代码匹配岗位名称
+        function matchPositionName() {
+            const positionCode = document.getElementById('positionCode').value.trim();
+            const positionNameDisplay = document.getElementById('positionNameDisplay');
+            
+            // 模拟岗位代码匹配逻辑
+            const positionMapping = {
+                'A001': '市教育局教师岗',
+                'A002': '市人社局公务员岗', 
+                'A003': '市财政局会计岗',
+                'B001': '县法院书记员岗',
+                'B002': '县检察院检察员岗'
+            };
+            
+            if (positionCode && positionMapping[positionCode]) {
+                positionNameDisplay.value = positionMapping[positionCode];
+            } else if (positionCode) {
+                positionNameDisplay.value = '未找到匹配的岗位，请检查代码';
+            } else {
+                positionNameDisplay.value = '请先输入岗位代码';
+            }
+        }
+        
+        // 身份证上传功能
+        function selectIdCard() {
+            document.getElementById('idCardInput').click();
+        }
+        
+        function handleIdCardSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const uploadArea = document.getElementById('idCardUploadArea');
+                    const imagePreview = document.getElementById('idCardPreview');
+                    const previewImg = document.getElementById('idCardImg');
+                    
+                    uploadArea.style.display = 'none';
+                    imagePreview.style.display = 'block';
+                    previewImg.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function previewIdCard() {
+            const previewImg = document.getElementById('idCardImg');
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write('<img src="' + previewImg.src + '" style="max-width: 100%; max-height: 100%;">');
+        }
+        
+        function deleteIdCard() {
+            if (confirm('确定要删除这张身份证照片吗？')) {
+                const uploadArea = document.getElementById('idCardUploadArea');
+                const imagePreview = document.getElementById('idCardPreview');
+                
+                uploadArea.style.display = 'block';
+                imagePreview.style.display = 'none';
+                document.getElementById('idCardInput').value = '';
+            }
+        }
+        
+        // 笔试成绩截图上传功能
+        function selectExamScore() {
+            document.getElementById('examScoreInput').click();
+        }
+        
+        function handleExamScoreSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const uploadArea = document.getElementById('examScoreUploadArea');
+                    const imagePreview = document.getElementById('examScorePreview');
+                    const previewImg = document.getElementById('examScoreImg');
+                    
+                    uploadArea.style.display = 'none';
+                    imagePreview.style.display = 'block';
+                    previewImg.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function previewExamScore() {
+            const previewImg = document.getElementById('examScoreImg');
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write('<img src="' + previewImg.src + '" style="max-width: 100%; max-height: 100%;">');
+        }
+        
+        function deleteExamScore() {
+            if (confirm('确定要删除这张成绩截图吗？')) {
+                const uploadArea = document.getElementById('examScoreUploadArea');
+                const imagePreview = document.getElementById('examScorePreview');
+                
+                uploadArea.style.display = 'block';
+                imagePreview.style.display = 'none';
+                document.getElementById('examScoreInput').value = '';
+            }
+        }
         function submitForm() {
             const name = document.getElementById('userName').value.trim();
             const phone = document.getElementById('userPhone').value.trim();
@@ -1601,6 +1922,28 @@
         }
         
         // 银行卡复制功能
+        function copyRegistrationBankAccount() {
+            const accountText = document.getElementById('registrationAccountNumber').textContent;
+            const bankCardNumber = accountText.match(/\d{4} \d{4} \d{4} \d{4}/);
+            
+            if (bankCardNumber) {
+                const cardNumber = bankCardNumber[0].replace(/\s/g, ''); // 移除空格
+                navigator.clipboard.writeText(cardNumber).then(() => {
+                    alert('银行卡号已复制：' + bankCardNumber[0]);
+                }).catch(() => {
+                    // 兼容性处理
+                    const textArea = document.createElement('textarea');
+                    textArea.value = cardNumber;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('银行卡号已复制：' + bankCardNumber[0]);
+                });
+            } else {
+                alert('当前支付方式暂不支持复制');
+            }
+        }
         
         function copyBankAccount() {
             const accountText = document.getElementById('accountNumber').textContent;
