@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优惠管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link active">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1 class="page-title">优惠管理</h1>
+                <p class="page-subtitle">管理优惠类目和金额，用于计算最终缴费金额</p>
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-primary" onclick="showAddDiscountModal()">
+                        <i class="fas fa-plus"></i> 新建优惠
+                    </button>
+                    <button class="btn btn-success" onclick="exportDiscounts()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn btn-warning" onclick="showImportModal()">
+                        <i class="fas fa-upload"></i> 导入数据
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <select class="form-select" style="width: 150px;" onchange="filterDiscounts()" id="typeFilter">
+                        <option value="">全部类型</option>
+                        <option value="defender">守擂优惠</option>
+                        <option value="old_student">老学员优惠</option>
+                        <option value="referral">老学员推荐优惠</option>
+                    </select>
+                    <select class="form-select" style="width: 120px;" onchange="filterDiscounts()" id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="active">生效中</option>
+                        <option value="inactive">已停用</option>
+                        <option value="expired">已过期</option>
+                    </select>
+                    <select class="form-select" style="width: 140px;" onchange="filterDiscounts()" id="audienceFilter">
+                        <option value="">全部人群</option>
+                        <option value="contract">协议用户</option>
+                        <option value="non_contract">非协议用户</option>
+                        <option value="all">全体用户</option>
+                    </select>
+                    <input type="text" class="search-box" placeholder="搜索优惠名称" id="searchInput">
+                    <button class="btn btn-secondary" onclick="searchDiscounts()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>优惠ID</th>
+                                <th>优惠名称</th>
+                                <th>所属项目</th>
+                                <th>优惠类型</th>
+                                <th>优惠金额</th>
+                                <th>生效人群</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="discountTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑优惠模态框 -->
+    <div id="discountModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="discountModalTitle">新建优惠</h3>
+                <button class="modal-close" onclick="closeDiscountModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="discountForm">
+                    <div class="form-group">
+                        <label class="form-label">优惠名称 <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="discountName" required placeholder="请输入优惠名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">所属项目 <span class="form-required">*</span></label>
+                        <select class="form-select" id="discountProject" required>
+                            <option value="">请选择项目</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">优惠类型 <span class="form-required">*</span></label>
+                        <select class="form-select" id="discountType" required>
+                            <option value="">请选择优惠类型</option>
+                            <option value="defender">守擂优惠</option>
+                            <option value="old_student">老学员优惠</option>
+                            <option value="referral">老学员推荐优惠</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">优惠金额 <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="discountValue" required 
+                                   min="0" step="0.01" placeholder="优惠金额（元）">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="discountStatus">
+                                <option value="active">生效中</option>
+                                <option value="inactive">已停用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">生效人群 <span class="form-required">*</span></label>
+                        <select class="form-select" id="discountAudience" required>
+                            <option value="">请选择生效人群</option>
+                            <option value="contract">协议用户</option>
+                            <option value="non_contract">非协议用户</option>
+                            <option value="all">全部用户</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDiscountModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveDiscount()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入数据模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">导入优惠数据</h3>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload" onclick="selectImportFile()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                    <div class="file-upload-text">点击选择Excel文件或拖拽到此处</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        支持.xlsx/.xls格式，文件大小不超过10MB
+                    </div>
+                </div>
+                <input type="file" id="importFile" accept=".xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                
+                <div id="importPreview" style="display: none; margin-top: 20px;">
+                    <h4>导入预览</h4>
+                    <div id="importSummary"></div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>导入说明：</h5>
+                    <ul style="margin: 10px 0; padding-left: 20px; font-size: 14px; color: #666;">
+                        <li>Excel第一行应为列标题：优惠名称、所属项目、优惠类型、优惠金额、生效人群</li>
+                        <li>优惠名称、所属项目、优惠类型、优惠金额和生效人群为必填项</li>
+                        <li>优惠类型可选值：defender（守擂优惠）、old_student（老学员优惠）、referral（老学员推荐优惠）</li>
+                        <li>所属项目必须是已存在的项目名称</li>
+                        <li>生效人群可选值：contract（协议用户）、non_contract（非协议用户）、all（全体用户）</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" id="importBtn" onclick="importDiscounts()" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let allDiscounts = [];
+        let filteredDiscounts = [];
+        let editingDiscountId = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDiscounts();
+        });
+
+        // 模拟项目数据
+        function generateMockProjects() {
+            return [
+                { id: 1, name: '2024年选调生培训', type: '选调生' },
+                { id: 2, name: '2024年省考培训', type: '省考' },
+                { id: 3, name: '2024年申论专项培训', type: '申论' },
+                { id: 4, name: '2024年国考培训', type: '国考' },
+                { id: 5, name: '2024年事业单位培训', type: '事业单位' }
+            ];
+        }
+
+        // 模拟优惠数据
+        function generateMockDiscounts() {
+            const discountTypes = ['defender', 'old_student', 'referral'];
+            const discountTypeNames = ['守擂优惠', '老学员优惠', '老学员推荐优惠'];
+            const audienceOptions = [
+                { value: 'contract', label: '协议用户' },
+                { value: 'non_contract', label: '非协议用户' },
+                { value: 'all', label: '全部用户' }
+            ];
+            const allProjects = generateMockProjects();
+            const now = Date.now();
+            const mockData = [];
+
+            for (let i = 1; i <= 20; i++) {
+                const typeIndex = Math.floor(Math.random() * discountTypes.length);
+                const type = discountTypes[typeIndex];
+                const project = allProjects[Math.floor(Math.random() * allProjects.length)];
+                const audience = audienceOptions[Math.floor(Math.random() * audienceOptions.length)];
+
+                // 创建时间、生效时间、失效时间
+                const createTime = new Date(now - Math.random() * 20 * 24 * 60 * 60 * 1000);
+                const startTime = new Date(createTime.getTime() + Math.random() * 5 * 24 * 60 * 60 * 1000);
+                const endTime = new Date(startTime.getTime() + (Math.random() * 40 + 10) * 24 * 60 * 60 * 1000);
+
+                // 优惠金额与额外信息
+                let value;
+                let maxDiscount = null;
+                switch (type) {
+                    case 'defender':
+                        value = Math.floor(Math.random() * 1000) + 500; // 500-1500元
+                        break;
+                    case 'old_student':
+                        value = Math.floor(Math.random() * 500) + 200; // 200-700元
+                        maxDiscount = value + 200;
+                        break;
+                    case 'referral':
+                        value = Math.floor(Math.random() * 800) + 300; // 300-1100元
+                        maxDiscount = value + 300;
+                        break;
+                    default:
+                        value = Math.floor(Math.random() * 500) + 100;
+                }
+
+                const startTimeText = startTime.toISOString().slice(0, 19).replace('T', ' ');
+                const endTimeText = endTime.toISOString().slice(0, 19).replace('T', ' ');
+                const status = endTime.getTime() < now
+                    ? 'inactive'
+                    : (Math.random() > 0.2 ? 'active' : 'inactive');
+
+                mockData.push({
+                    id: i,
+                    name: `${project.name} - ${discountTypeNames[typeIndex]}${i}`,
+                    type,
+                    typeName: discountTypeNames[typeIndex],
+                    value,
+                    maxDiscount,
+                    projectId: project.id,
+                    projectName: project.name,
+                    audience: audience.value,
+                    audienceName: audience.label,
+                    startTime: startTimeText,
+                    endTime: endTimeText,
+                    status,
+                    usedCount: Math.floor(Math.random() * 80),
+                    description: `${project.name}${discountTypeNames[typeIndex]}专属优惠，限时领取。`,
+                    createTime: createTime.toISOString().slice(0, 19).replace('T', ' '),
+                    creator: '管理员'
+                });
+            }
+
+            return mockData.sort((a, b) => b.createTime.localeCompare(a.createTime));
+        }
+
+        // 加载优惠数据
+        function loadDiscounts() {
+            allDiscounts = generateMockDiscounts();
+            filteredDiscounts = [...allDiscounts];
+            totalItems = filteredDiscounts.length;
+            loadProjects();
+            renderTable();
+            updatePagination();
+        }
+
+        // 加载项目数据到下拉框
+        function loadProjects() {
+            const allProjects = generateMockProjects();
+            const discountProject = document.getElementById('discountProject');
+            
+            // 清空现有选项
+            discountProject.innerHTML = '<option value="">请选择项目</option>';
+            
+            allProjects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = project.name;
+                discountProject.appendChild(option);
+            });
+        }
+
+
+        // 获取状态信息
+        function getStatusInfo(status, endTime) {
+            const now = new Date();
+            const end = new Date(endTime);
+            
+            if (end < now) {
+                return { text: '已过期', class: 'status-inactive' };
+            }
+            
+            switch(status) {
+                case 'active':
+                    return { text: '生效中', class: 'status-active' };
+                case 'inactive':
+                    return { text: '已停用', class: 'status-pending' };
+                default:
+                    return { text: status, class: 'status-pending' };
+            }
+        }
+
+        function formatDiscountValue(type, value, maxDiscount) {
+            const numeric = Number(value || 0);
+            return `¥${numeric.toLocaleString()}`;
+        }
+
+        function calculateMaxDiscount(type, value) {
+            const numeric = Number(value) || 0;
+            switch (type) {
+                case 'old_student':
+                    return Math.round(numeric + 200);
+                case 'referral':
+                    return Math.round(numeric + 300);
+                default:
+                    return null;
+            }
+        }
+
+        function buildDiscountDescription(projectName, typeName) {
+            return `${projectName}${typeName}专属优惠，限时领取。`;
+        }
+
+        const audienceLabels = {
+            contract: '协议用户',
+            non_contract: '非协议用户',
+            all: '全部用户'
+        };
+
+        function getAudienceLabel(value) {
+            return audienceLabels[value] || '全部用户';
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('discountTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredDiscounts.slice(start, end);
+
+            tbody.innerHTML = pageData.map(discount => {
+                const statusInfo = getStatusInfo(discount.status, discount.endTime);
+                
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="discount-checkbox" value="${discount.id}"></td>
+                        <td>${discount.id}</td>
+                        <td>
+                            <div style="font-weight: bold;">${discount.name}</div>
+                        </td>
+                        <td>${discount.projectName}</td>
+                        <td><span style="background: #f0f8f0; color: #52c41a; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${discount.typeName}</span></td>
+                        <td><strong style="color: #f39c12;">${formatDiscountValue(discount.type, discount.value, discount.maxDiscount)}</strong></td>
+                        <td><span style="display: inline-block; background: #eef3ff; color: #3b5bdb; padding: 2px 10px; border-radius: 12px; font-size: 12px;">${getAudienceLabel(discount.audience)}</span></td>
+                        <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                        <td>${discount.createTime}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="editDiscount(${discount.id})" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="duplicateDiscount(${discount.id})" title="复制">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="btn btn-sm ${discount.status === 'active' ? 'btn-warning' : 'btn-secondary'}" 
+                                    onclick="toggleStatus(${discount.id})" 
+                                    title="${discount.status === 'active' ? '停用' : '启用'}">
+                                <i class="fas fa-${discount.status === 'active' ? 'pause' : 'play'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteDiscount(${discount.id})" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalItems;
+        }
+
+        // 搜索优惠
+        function searchDiscounts() {
+            applyFilters();
+        }
+
+        // 筛选优惠
+        function filterDiscounts() {
+            applyFilters();
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const audienceFilter = document.getElementById('audienceFilter').value;
+            
+            filteredDiscounts = allDiscounts.filter(discount => {
+                const descriptionText = (discount.description || '').toLowerCase();
+                const matchesSearch = !searchTerm || 
+                    discount.name.toLowerCase().includes(searchTerm) ||
+                    descriptionText.includes(searchTerm);
+                
+                const matchesType = !typeFilter || discount.type === typeFilter;
+                const matchesAudience = !audienceFilter || discount.audience === audienceFilter;
+                
+                let actualStatus = discount.status;
+                if (new Date(discount.endTime) < new Date()) {
+                    actualStatus = 'expired';
+                }
+                const matchesStatus = !statusFilter || actualStatus === statusFilter;
+                
+                return matchesSearch && matchesType && matchesStatus && matchesAudience;
+            });
+            
+            totalItems = filteredDiscounts.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示新建优惠模态框
+        function showAddDiscountModal() {
+            editingDiscountId = null;
+            document.getElementById('discountModalTitle').textContent = '新建优惠';
+            document.getElementById('discountForm').reset();
+            document.getElementById('discountAudience').value = '';
+            document.getElementById('discountModal').style.display = 'block';
+        }
+
+        // 关闭优惠模态框
+        function closeDiscountModal() {
+            document.getElementById('discountModal').style.display = 'none';
+            editingDiscountId = null;
+        }
+
+        // 编辑优惠
+        function editDiscount(discountId) {
+            const discount = allDiscounts.find(d => d.id === discountId);
+            if (!discount) return;
+
+            editingDiscountId = discountId;
+            document.getElementById('discountModalTitle').textContent = '编辑优惠';
+            document.getElementById('discountName').value = discount.name;
+            document.getElementById('discountProject').value = discount.projectId;
+            document.getElementById('discountType').value = discount.type;
+            document.getElementById('discountValue').value = discount.value;
+            document.getElementById('discountStatus').value = discount.status;
+            document.getElementById('discountAudience').value = discount.audience || '';
+            
+            document.getElementById('discountModal').style.display = 'block';
+        }
+
+        // 保存优惠
+        function saveDiscount() {
+            const formData = {
+                name: document.getElementById('discountName').value.trim(),
+                projectId: parseInt(document.getElementById('discountProject').value, 10),
+                type: document.getElementById('discountType').value,
+                value: parseFloat(document.getElementById('discountValue').value),
+                status: document.getElementById('discountStatus').value,
+                audience: document.getElementById('discountAudience').value
+            };
+
+            // 表单验证
+            if (!formData.name) {
+                alert('请输入优惠名称');
+                return;
+            }
+            if (!formData.projectId) {
+                alert('请选择所属项目');
+                return;
+            }
+            if (!formData.type) {
+                alert('请选择优惠类型');
+                return;
+            }
+            if (isNaN(formData.value) || formData.value <= 0) {
+                alert('请输入正确的优惠金额');
+                return;
+            }
+            if (!formData.audience) {
+                alert('请选择生效人群');
+                return;
+            }
+
+            // 获取类型名称和项目信息
+            const typeNames = {
+                'defender': '守擂优惠',
+                'old_student': '老学员优惠',
+                'referral': '老学员推荐优惠',
+                'group': '组团优惠'
+            };
+            
+            const allProjects = generateMockProjects();
+            const project = allProjects.find(p => p.id === formData.projectId);
+            if (!project) {
+                alert('所选项目不存在，请刷新后重试');
+                return;
+            }
+
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            if (editingDiscountId) {
+                // 编辑模式
+                const discountIndex = allDiscounts.findIndex(d => d.id === editingDiscountId);
+                const previous = allDiscounts[discountIndex];
+                allDiscounts[discountIndex] = {
+                    ...previous,
+                    ...formData,
+                    typeName: typeNames[formData.type],
+                    projectName: project.name,
+                    maxDiscount: calculateMaxDiscount(formData.type, formData.value),
+                    description: buildDiscountDescription(project.name, typeNames[formData.type]),
+                    audienceName: getAudienceLabel(formData.audience)
+                };
+                showNotification('优惠更新成功', 'success');
+            } else {
+                // 新增模式
+                const startBaseline = new Date();
+                const endBaseline = new Date(startBaseline.getTime() + 30 * 24 * 60 * 60 * 1000);
+                const startTimeText = startBaseline.toISOString().slice(0, 19).replace('T', ' ');
+                const endTimeText = endBaseline.toISOString().slice(0, 19).replace('T', ' ');
+
+                const newDiscount = {
+                    id: Math.max(...allDiscounts.map(d => d.id), 0) + 1,
+                    ...formData,
+                    typeName: typeNames[formData.type],
+                    projectName: project.name,
+                    maxDiscount: calculateMaxDiscount(formData.type, formData.value),
+                    usedCount: 0,
+                    description: buildDiscountDescription(project.name, typeNames[formData.type]),
+                    audienceName: getAudienceLabel(formData.audience),
+                    startTime: startTimeText,
+                    endTime: endTimeText,
+                    createTime: now,
+                    creator: '管理员'
+                };
+                allDiscounts.unshift(newDiscount);
+                showNotification('优惠创建成功', 'success');
+            }
+
+            closeDiscountModal();
+            applyFilters();
+        }
+
+        // 复制优惠
+        function duplicateDiscount(discountId) {
+            const discount = allDiscounts.find(d => d.id === discountId);
+            if (!discount) return;
+
+            const now = new Date();
+            const startTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 明天
+            const endTime = new Date(startTime.getTime() + 30 * 24 * 60 * 60 * 1000); // 30天后
+
+            const newDiscount = {
+                ...discount,
+                id: Math.max(...allDiscounts.map(d => d.id), 0) + 1,
+                name: discount.name + ' (副本)',
+                startTime: startTime.toISOString().slice(0, 19).replace('T', ' '),
+                endTime: endTime.toISOString().slice(0, 19).replace('T', ' '),
+                status: 'active',
+                usedCount: 0,
+                createTime: now.toISOString().slice(0, 19).replace('T', ' '),
+                audienceName: getAudienceLabel(discount.audience)
+            };
+
+            allDiscounts.unshift(newDiscount);
+            showNotification('优惠复制成功', 'success');
+            applyFilters();
+        }
+
+        // 切换状态
+        function toggleStatus(discountId) {
+            const discount = allDiscounts.find(d => d.id === discountId);
+            if (!discount) return;
+
+            // 检查是否已过期
+            if (new Date(discount.endTime) < new Date()) {
+                alert('已过期的优惠无法修改状态');
+                return;
+            }
+
+            const newStatus = discount.status === 'active' ? 'inactive' : 'active';
+            discount.status = newStatus;
+            
+            const action = newStatus === 'active' ? '启用' : '停用';
+            showNotification(`优惠${action}成功`, 'success');
+            
+            renderTable();
+        }
+
+        // 删除优惠
+        function deleteDiscount(discountId) {
+            const discount = allDiscounts.find(d => d.id === discountId);
+            if (!discount) return;
+
+            if (discount.usedCount > 0) {
+                if (!confirm(`该优惠已被使用 ${discount.usedCount} 次，删除后将影响历史数据统计，确定要删除吗？`)) {
+                    return;
+                }
+            }
+
+            if (confirm(`确定要删除优惠"${discount.name}"吗？`)) {
+                allDiscounts = allDiscounts.filter(d => d.id !== discountId);
+                showNotification('优惠删除成功', 'success');
+                applyFilters();
+            }
+        }
+
+        // 批量选择
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.discount-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // 导出优惠数据
+        function exportDiscounts() {
+            const csvContent = generateCSV(filteredDiscounts);
+            downloadCSV(csvContent, 'discounts.csv');
+            showNotification('优惠数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['优惠ID', '优惠名称', '优惠类型', '生效人群', '优惠信息', '最大优惠', '使用次数', '生效时间', '失效时间', '状态', '创建时间'];
+            const rows = data.map(discount => {
+                const statusInfo = getStatusInfo(discount.status, discount.endTime);
+                const valueText = formatDiscountValue(discount.type, discount.value, discount.maxDiscount);
+                return [
+                    discount.id,
+                    discount.name,
+                    discount.typeName,
+                    getAudienceLabel(discount.audience),
+                    valueText,
+                    discount.maxDiscount || '无',
+                    discount.usedCount,
+                    discount.startTime,
+                    discount.endTime,
+                    statusInfo.text,
+                    discount.createTime
+                ];
+            });
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // 导入相关功能
+        function showImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importBtn').disabled = true;
+        }
+
+        function selectImportFile() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('importSummary').innerHTML = `
+                <p>文件名：${file.name}</p>
+                <p>文件大小：${(file.size / 1024).toFixed(2)} KB</p>
+                <p>准备导入优惠数据...</p>
+            `;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importBtn').disabled = false;
+        }
+
+        function importDiscounts() {
+            showNotification('正在导入优惠数据...', 'info');
+            setTimeout(() => {
+                showNotification('优惠数据导入成功', 'success');
+                closeImportModal();
+                loadDiscounts();
+            }, 2000);
+        }
+
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

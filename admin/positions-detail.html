@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>招考岗位管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link active">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div class="page-breadcrumb">
+                    <a href="positions-projects.html" class="breadcrumb-link">
+                        <i class="fas fa-arrow-left"></i>
+                        返回项目列表
+                    </a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current" id="currentProjectName">招考岗位管理</span>
+                </div>
+                <h1 class="page-title" id="pageTitle">招考岗位管理</h1>
+                <p class="page-subtitle" id="pageSubtitle">查看和管理招考岗位信息及状态</p>
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-primary" onclick="showAddPositionModal()">
+                        <i class="fas fa-plus"></i> 新建岗位
+                    </button>
+                    <button class="btn btn-success" onclick="exportPositions()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn btn-warning" onclick="showImportModal()">
+                        <i class="fas fa-upload"></i> 导入数据
+                    </button>
+                  </div>
+                <div class="toolbar-right">
+                    <select class="form-select" style="width: 150px;" onchange="filterPositions()" id="projectFilter">
+                        <option value="">全部项目</option>
+                    </select>
+                    <select class="form-select" style="width: 120px;" onchange="filterPositions()" id="regionFilter">
+                        <option value="">全部地区</option>
+                        <option value="北京">北京</option>
+                        <option value="上海">上海</option>
+                        <option value="广东">广东</option>
+                        <option value="江苏">江苏</option>
+                        <option value="浙江">浙江</option>
+                        <option value="山东">山东</option>
+                        <option value="河南">河南</option>
+                        <option value="四川">四川</option>
+                        <option value="湖北">湖北</option>
+                        <option value="福建">福建</option>
+                    </select>
+                    <select class="form-select" style="width: 120px;" onchange="filterPositions()" id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="recruiting">招录中</option>
+                        <option value="closed">已停招</option>
+                        <option value="completed">已结束</option>
+                    </select>
+                    <input type="text" class="search-box" placeholder="搜索岗位代码/名称" id="searchInput" onkeyup="handleSearchKeyup(event)">
+                    <button class="btn btn-secondary" onclick="searchPositions()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+  
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>岗位代码</th>
+                                <th>岗位名称</th>
+                                <th>所属地区</th>
+                                <th>招录人数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positionTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑岗位模态框 -->
+    <div id="positionModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="positionModalTitle">新建岗位</h3>
+                <button class="modal-close" onclick="closePositionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="positionForm">
+                    <div class="form-group">
+                        <label class="form-label">岗位代码 <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="positionCode" required placeholder="如：2024001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">岗位名称 <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="positionName" required placeholder="请输入岗位名称">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">所属地区 <span class="form-required">*</span></label>
+                            <select class="form-select" id="region" required>
+                                <option value="">请选择地区</option>
+                                <option value="北京">北京</option>
+                                <option value="上海">上海</option>
+                                <option value="广东">广东</option>
+                                <option value="江苏">江苏</option>
+                                <option value="浙江">浙江</option>
+                                <option value="山东">山东</option>
+                                <option value="河南">河南</option>
+                                <option value="四川">四川</option>
+                                <option value="湖北">湖北</option>
+                                <option value="福建">福建</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">招录人数 <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="recruitCount" required min="1" placeholder="1">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePositionModal()">取消</button>
+                <button class="btn btn-primary" onclick="savePosition()">保存</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- 导入数据模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">导入岗位数据</h3>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload" onclick="selectImportFile()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                    <div class="file-upload-text">点击选择Excel文件或拖拽到此处</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        支持.xlsx/.xls格式，文件大小不超过10MB
+                    </div>
+                </div>
+                <input type="file" id="importFile" accept=".xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                
+                <div id="importPreview" style="display: none; margin-top: 20px;">
+                    <h4>导入预览</h4>
+                    <div id="importSummary"></div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>导入说明：</h5>
+                    <ul style="margin: 10px 0; padding-left: 20px; font-size: 14px; color: #666;">
+                        <li>Excel第一行应为列标题：岗位代码、岗位名称、所属地区、招录人数、招录部门、学历要求、专业要求</li>
+                        <li>岗位代码、岗位名称、所属地区和招录人数为必填项</li>
+                        <li>所属地区必须在系统预设地区列表中</li>
+                        <li>重复岗位代码将被跳过</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" id="importBtn" onclick="importPositions()" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let allPositions = [];
+        let filteredPositions = [];
+        let editingPositionId = null;
+        let allProjects = [];
+
+        // 读取URL参数
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name) || '';
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 处理URL参数并更新页面标题
+            const projectName = getQueryParam('projectName');
+            if (projectName) {
+                document.getElementById('currentProjectName').textContent = projectName;
+                document.getElementById('pageTitle').textContent = `${projectName} - 招考岗位管理`;
+                document.getElementById('pageSubtitle').textContent = `当前项目：${projectName}，可查看和管理招考岗位信息`;
+            }
+            
+            loadProjects();
+            loadPositions();
+        });
+
+        // 模拟项目数据
+        function generateMockProjects() {
+            return [
+                { id: 1, name: '2024年选调生培训', type: '选调生' },
+                { id: 2, name: '2024年省考培训', type: '省考' },
+                { id: 3, name: '2024年申论专项培训', type: '申论' },
+                { id: 4, name: '2024年国考培训', type: '国考' },
+                { id: 5, name: '2024年事业单位培训', type: '事业单位' }
+            ];
+        }
+
+        // 模拟岗位数据
+        function generateMockPositions() {
+            const regions = ['北京', '上海', '广东', '江苏', '浙江', '山东', '河南', '四川', '湖北', '福建'];
+            const departments = ['财政局', '税务局', '教育局', '卫生局', '公安局', '人社局', '发改委', '农业局', '住建局', '环保局'];
+            const levels = ['科员', '主任科员', '副主任科员', '调研员', '副调研员', '处长', '副处长'];
+            const educations = ['本科', '硕士', '博士', '大专'];
+            const majors = ['计算机类', '经济学类', '管理学类', '法学类', '文学类', '理学类', '工学类', '医学类'];
+            const statuses = ['recruiting', 'closed', 'completed'];
+            const mockData = [];
+            
+            // 获取URL参数中的项目ID，如果没有则显示所有项目岗位
+            const projectId = getQueryParam('projectId');
+            const targetProjects = projectId ? allProjects.filter(p => p.id === parseInt(projectId)) : allProjects;
+            
+            let positionId = 1;
+            targetProjects.forEach(project => {
+                const positionsPerProject = projectId ? Math.floor(Math.random() * 20) + 10 : Math.floor(Math.random() * 5) + 3;
+                
+                for (let i = 1; i <= positionsPerProject; i++) {
+                    const region = regions[Math.floor(Math.random() * regions.length)];
+                    const department = departments[Math.floor(Math.random() * departments.length)];
+                    const recruitCount = Math.floor(Math.random() * 5) + 1;
+                    
+                    mockData.push({
+                        id: positionId++,
+                        code: `${project.type.charAt(0)}${new Date().getFullYear()}${i.toString().padStart(3, '0')}`,
+                        name: `${region}${department}${levels[Math.floor(Math.random() * levels.length)]}`,
+                        projectId: project.id,
+                        projectName: project.name,
+                        region: region,
+                        recruitCount: recruitCount
+                    });
+                }
+            });
+            return mockData.sort((a, b) => a.code.localeCompare(b.code));
+        }
+
+        // 加载项目数据
+        function loadProjects() {
+            allProjects = generateMockProjects();
+            
+            // 填充项目筛选选项
+            const projectFilter = document.getElementById('projectFilter');
+            
+            allProjects.forEach(project => {
+                // 筛选选项
+                const option1 = document.createElement('option');
+                option1.value = project.id;
+                option1.textContent = project.name;
+                projectFilter.appendChild(option1);
+            });
+        }
+
+        // 加载岗位数据
+        function loadPositions() {
+            allPositions = generateMockPositions();
+            filteredPositions = [...allPositions];
+            totalItems = filteredPositions.length;
+            renderTable();
+            updatePagination();
+        }
+
+
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('positionTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredPositions.slice(start, end);
+
+            tbody.innerHTML = pageData.map(position => {
+                return `
+                    <tr>
+                        <td><strong>${position.code}</strong></td>
+                        <td>
+                            <div style="font-weight: bold;">${position.name}</div>
+                        </td>
+                        <td>
+                            <span style="background: #e6f7ff; color: #1890ff; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                                ${position.region}
+                            </span>
+                        </td>
+                        <td><strong style="color: #52c41a;">${position.recruitCount}</strong></td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="editPosition(${position.id})" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deletePosition(${position.id})" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalItems;
+        }
+
+        // 处理搜索框回车事件
+        function handleSearchKeyup(event) {
+            if (event.key === 'Enter') {
+                searchPositions();
+            }
+        }
+
+        // 搜索岗位
+        function searchPositions() {
+            applyFilters();
+        }
+
+        // 筛选岗位
+        function filterPositions() {
+            applyFilters();
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const projectFilter = document.getElementById('projectFilter').value;
+            const regionFilter = document.getElementById('regionFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            filteredPositions = allPositions.filter(position => {
+                const matchesSearch = !searchTerm || 
+                    position.code.toLowerCase().includes(searchTerm) ||
+                    position.name.toLowerCase().includes(searchTerm) ||
+                    position.department.toLowerCase().includes(searchTerm);
+                
+                const matchesProject = !projectFilter || position.projectId.toString() === projectFilter;
+                const matchesRegion = !regionFilter || position.region === regionFilter;
+                const matchesStatus = !statusFilter || position.status === statusFilter;
+                
+                return matchesSearch && matchesProject && matchesRegion && matchesStatus;
+            });
+            
+            totalItems = filteredPositions.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示新建岗位模态框
+        function showAddPositionModal() {
+            editingPositionId = null;
+            document.getElementById('positionModalTitle').textContent = '新建岗位';
+            document.getElementById('positionForm').reset();
+            
+            // 设置默认截止时间
+            const deadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+            document.getElementById('deadline').value = deadline.toISOString().slice(0, 16);
+            
+            document.getElementById('positionModal').style.display = 'block';
+        }
+
+        // 关闭岗位模态框
+        function closePositionModal() {
+            document.getElementById('positionModal').style.display = 'none';
+            editingPositionId = null;
+        }
+
+        // 编辑岗位
+        function editPosition(positionId) {
+            const position = allPositions.find(p => p.id === positionId);
+            if (!position) return;
+
+            editingPositionId = positionId;
+            document.getElementById('positionModalTitle').textContent = '编辑岗位';
+            document.getElementById('positionCode').value = position.code;
+            document.getElementById('positionName').value = position.name;
+            document.getElementById('region').value = position.region;
+            document.getElementById('recruitCount').value = position.recruitCount;
+            
+            document.getElementById('positionModal').style.display = 'block';
+        }
+
+        // 保存岗位
+        function savePosition() {
+            const formData = {
+                code: document.getElementById('positionCode').value.trim(),
+                name: document.getElementById('positionName').value.trim(),
+                region: document.getElementById('region').value,
+                recruitCount: parseInt(document.getElementById('recruitCount').value)
+            };
+
+            // 表单验证
+            if (!formData.code) {
+                alert('请输入岗位代码');
+                return;
+            }
+            if (!formData.name) {
+                alert('请输入岗位名称');
+                return;
+            }
+            if (!formData.region) {
+                alert('请选择所属地区');
+                return;
+            }
+            if (!formData.recruitCount || formData.recruitCount < 1) {
+                alert('请输入正确的招录人数');
+                return;
+            }
+
+            // 检查重复岗位代码
+            const existing = allPositions.find(p => p.code === formData.code && p.id !== editingPositionId);
+            if (existing) {
+                alert('该岗位代码已存在');
+                return;
+            }
+
+            // 获取项目信息
+            const projectId = getQueryParam('projectId');
+            const projectName = getQueryParam('projectName');
+
+            if (editingPositionId) {
+                // 编辑模式
+                const positionIndex = allPositions.findIndex(p => p.id === editingPositionId);
+                allPositions[positionIndex] = {
+                    ...allPositions[positionIndex],
+                    ...formData,
+                    projectId: parseInt(projectId),
+                    projectName: projectName
+                };
+                showNotification('岗位更新成功', 'success');
+            } else {
+                // 新增模式
+                const newPosition = {
+                    id: Math.max(...allPositions.map(p => p.id), 0) + 1,
+                    ...formData,
+                    projectId: parseInt(projectId),
+                    projectName: projectName
+                };
+                allPositions.unshift(newPosition);
+                showNotification('岗位创建成功', 'success');
+            }
+
+            closePositionModal();
+            applyFilters();
+        }
+
+
+
+        // 删除岗位
+        function deletePosition(positionId) {
+            const position = allPositions.find(p => p.id === positionId);
+            if (!position) return;
+
+            if (confirm(`确定要删除岗位"${position.name}"吗？`)) {
+                allPositions = allPositions.filter(p => p.id !== positionId);
+                showNotification('岗位删除成功', 'success');
+                applyFilters();
+            }
+        }
+
+
+        // 导出岗位数据
+        function exportPositions() {
+            const csvContent = generateCSV(filteredPositions);
+            downloadCSV(csvContent, 'positions.csv');
+            showNotification('岗位数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['岗位代码', '岗位名称', '所属地区', '招录人数'];
+            const rows = data.map(position => {
+                return [
+                    position.code,
+                    position.name,
+                    position.region,
+                    position.recruitCount
+                ];
+            });
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // 导入相关功能
+        function showImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importBtn').disabled = true;
+        }
+
+        function selectImportFile() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('importSummary').innerHTML = `
+                <p>文件名：${file.name}</p>
+                <p>文件大小：${(file.size / 1024).toFixed(2)} KB</p>
+                <p>准备导入岗位数据...</p>
+            `;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importBtn').disabled = false;
+        }
+
+        function importPositions() {
+            showNotification('正在导入岗位数据...', 'info');
+            setTimeout(() => {
+                showNotification('岗位数据导入成功', 'success');
+                closeImportModal();
+                loadPositions();
+            }, 2000);
+        }
+
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

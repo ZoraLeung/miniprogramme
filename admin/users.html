@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link active">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">用户管理</h1>
+                    <p class="page-subtitle">管理小程序用户信息和访问记录</p>
+                </div>
+                <!-- 用户信息区域 -->
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <div class="stats-update-time" id="totalVisitorsTime">刚刚</div>
+                    <div class="stats-number" id="totalVisitors">-</div>
+                    <div class="stats-label">访问总人数</div>
+                    <div class="stats-description">累计访问小程序的用户总数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="validUsersTime">刚刚</div>
+                    <div class="stats-number" id="validUsers">-</div>
+                    <div class="stats-label">有效用户数</div>
+                    <div class="stats-description">已授权手机号的有效用户</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="recentVisitorsTime">刚刚</div>
+                    <div class="stats-number" id="recentVisitors">-</div>
+                    <div class="stats-label">近一月访问</div>
+                    <div class="stats-description">最近30天内的活跃用户数量</div>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-success" onclick="exportUsers()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadUserStats()">
+                        <i class="fas fa-sync" id="refreshIcon"></i> 刷新数据
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <input type="text" class="search-box" placeholder="搜索用户（OpenID/微信号/手机号）" id="searchInput" onkeyup="handleSearchKeyup(event)">
+                    <button class="btn btn-secondary" onclick="searchUsers()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>用户ID</th>
+                                <th>OpenID</th>
+                                <th>微信号</th>
+                                <th>手机号</th>
+                                <th>首次访问</th>
+                                <th>最新访问</th>
+                                <th>访问次数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑用户模态框 -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="userModalTitle">新增用户</h3>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <div class="form-group">
+                        <label class="form-label">OpenID <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="openid" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">微信号</label>
+                        <input type="text" class="form-control" id="nickname" placeholder="需用户授权后获取">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">手机号</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="需用户授权后获取">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">首次访问时间</label>
+                        <input type="datetime-local" class="form-control" id="firstVisit" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">最新访问时间</label>
+                        <input type="datetime-local" class="form-control" id="lastVisit" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">访问次数</label>
+                        <input type="number" class="form-control" id="visitCount" value="1" min="1" readonly>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUserModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveUser()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入数据模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">导入用户数据</h3>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload" onclick="selectImportFile()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                    <div class="file-upload-text">点击选择Excel文件或拖拽到此处</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        支持.xlsx/.xls格式，文件大小不超过10MB
+                    </div>
+                </div>
+                <input type="file" id="importFile" accept=".xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                
+                <div id="importPreview" style="display: none; margin-top: 20px;">
+                    <h4>导入预览</h4>
+                    <div id="importSummary"></div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>导入说明：</h5>
+                    <ul style="margin: 10px 0; padding-left: 20px; font-size: 14px; color: #666;">
+                        <li>Excel第一行应为列标题：OpenID、微信昵称、手机号、首次访问时间、最新访问时间</li>
+                        <li>OpenID为必填项，其他字段可为空</li>
+                        <li>时间格式：YYYY-MM-DD HH:mm:ss</li>
+                        <li>重复OpenID将被跳过</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" id="importBtn" onclick="importUsers()" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalUsers = 0;
+        let allUsers = [];
+        let filteredUsers = [];
+        let editingUserId = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserStats();
+            loadUsers();
+        });
+
+        // API 基础地址
+        const API_BASE = 'http://localhost:3000/api';
+
+        // 加载用户统计数据
+        async function loadUserStats() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            const cards = document.querySelectorAll('.stats-card');
+            
+            // 添加加载状态
+            refreshIcon.classList.add('refreshing');
+            cards.forEach(card => card.classList.add('loading'));
+            
+            // 更新数据更新时间
+            updateDataTime();
+            
+            try {
+                const response = await fetch(`${API_BASE}/users/stats`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const { totalVisitors, validUsers, recentVisitors } = result.data;
+                        
+                        // 更新数据显示
+                        document.getElementById('totalVisitors').textContent = totalVisitors.toLocaleString();
+                        document.getElementById('validUsers').textContent = validUsers.toLocaleString();
+                        document.getElementById('recentVisitors').textContent = recentVisitors.toLocaleString();
+                        
+                        showNotification('数据统计更新成功', 'success');
+                    } else {
+                        throw new Error(result.message || '获取统计数据失败');
+                    }
+                } else {
+                    throw new Error('API请求失败');
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+                showNotification('加载统计数据失败，使用模拟数据', 'warning');
+                
+                // 使用模拟数据
+                document.getElementById('totalVisitors').textContent = '150';
+                document.getElementById('validUsers').textContent = '105';
+                document.getElementById('recentVisitors').textContent = '89';
+            } finally {
+                // 移除加载状态
+                refreshIcon.classList.remove('refreshing');
+                cards.forEach(card => card.classList.remove('loading'));
+            }
+        }
+        
+        // 更新数据更新时间
+        function updateDataTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            
+            document.getElementById('totalVisitorsTime').textContent = timeStr;
+            document.getElementById('validUsersTime').textContent = timeStr;
+            document.getElementById('recentVisitorsTime').textContent = timeStr;
+        }
+
+        // 模拟用户数据
+        function generateMockUsers() {
+            const mockUsers = [];
+            const nicknames = ['小明', '小红', '张三', '李四', '王五', '赵六', '孙七', '周八', '吴九', '郑十'];
+            
+            for (let i = 1; i <= 50; i++) {
+                const firstVisit = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+                const lastVisit = new Date(firstVisit.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000);
+                
+                mockUsers.push({
+                    id: i,
+                    openid: `wx_${Math.random().toString(36).substr(2, 20)}`,
+                    nickname: nicknames[Math.floor(Math.random() * nicknames.length)] + i,
+                    phone: Math.random() > 0.3 ? `138${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}` : '',
+                    firstVisit: firstVisit.toISOString().slice(0, 19).replace('T', ' '),
+                    lastVisit: lastVisit.toISOString().slice(0, 19).replace('T', ' '),
+                    visitCount: Math.floor(Math.random() * 50) + 1
+                });
+            }
+            return mockUsers;
+        }
+
+        // 加载用户数据
+        function loadUsers() {
+            allUsers = generateMockUsers();
+            filteredUsers = [...allUsers];
+            totalUsers = filteredUsers.length;
+            renderTable();
+            updatePagination();
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('userTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageUsers = filteredUsers.slice(start, end);
+
+            tbody.innerHTML = pageUsers.map(user => `
+                <tr>
+                    <td><input type="checkbox" class="user-checkbox" value="${user.id}"></td>
+                    <td>${user.id}</td>
+                    <td title="${user.openid}">${user.openid.substr(0, 15)}...</td>
+                    <td>${user.nickname}</td>
+                    <td>${user.phone || '未授权'}</td>
+                    <td>${user.firstVisit}</td>
+                    <td>${user.lastVisit}</td>
+                    <td>${user.visitCount}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="editUser(${user.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalUsers);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalUsers;
+        }
+
+        // 搜索用户
+        function searchUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            filteredUsers = allUsers.filter(user => 
+                user.openid.toLowerCase().includes(searchTerm) ||
+                user.nickname.toLowerCase().includes(searchTerm) ||
+                (user.phone && user.phone.includes(searchTerm))
+            );
+            totalUsers = filteredUsers.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 处理搜索框键盘事件
+        function handleSearchKeyup(event) {
+            if (event.key === 'Enter') {
+                searchUsers();
+            }
+        }
+
+        // 筛选用户
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredUsers = allUsers.filter(user => {
+                const matchesSearch = !searchTerm || 
+                    user.openid.toLowerCase().includes(searchTerm) ||
+                    user.nickname.toLowerCase().includes(searchTerm) ||
+                    (user.phone && user.phone.includes(searchTerm));
+                return matchesSearch;
+            });
+            
+            totalUsers = filteredUsers.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示新增用户模态框
+        function showAddUserModal() {
+            editingUserId = null;
+            document.getElementById('userModalTitle').textContent = '新增用户';
+            document.getElementById('userForm').reset();
+            document.getElementById('userModal').style.display = 'block';
+        }
+
+        // 关闭用户模态框
+        function closeUserModal() {
+            document.getElementById('userModal').style.display = 'none';
+            editingUserId = null;
+        }
+
+        // 编辑用户
+        function editUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            editingUserId = userId;
+            document.getElementById('userModalTitle').textContent = '编辑用户';
+            document.getElementById('openid').value = user.openid;
+            document.getElementById('nickname').value = user.nickname;
+            document.getElementById('phone').value = user.phone;
+            document.getElementById('firstVisit').value = user.firstVisit.replace(' ', 'T');
+            document.getElementById('lastVisit').value = user.lastVisit.replace(' ', 'T');
+            document.getElementById('visitCount').value = user.visitCount;
+            
+            // 设置只读状态
+            document.getElementById('openid').readOnly = true;
+            document.getElementById('firstVisit').readOnly = true;
+            document.getElementById('lastVisit').readOnly = true;
+            document.getElementById('visitCount').readOnly = true;
+            
+            // 设置可编辑状态
+            document.getElementById('nickname').readOnly = false;
+            document.getElementById('phone').readOnly = false;
+            
+            document.getElementById('userModal').style.display = 'block';
+        }
+
+        // 保存用户
+        function saveUser() {
+            const formData = {
+                openid: document.getElementById('openid').value.trim(),
+                nickname: document.getElementById('nickname').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                firstVisit: document.getElementById('firstVisit').value.replace('T', ' '),
+                lastVisit: document.getElementById('lastVisit').value.replace('T', ' '),
+                visitCount: parseInt(document.getElementById('visitCount').value) || 1
+            };
+
+            if (!formData.openid) {
+                alert('OpenID不能为空');
+                return;
+            }
+
+            if (editingUserId) {
+                // 编辑模式
+                const userIndex = allUsers.findIndex(u => u.id === editingUserId);
+                allUsers[userIndex] = { ...allUsers[userIndex], ...formData };
+                showNotification('用户信息更新成功', 'success');
+            } else {
+                // 新增模式
+                const newUser = {
+                    id: Math.max(...allUsers.map(u => u.id)) + 1,
+                    ...formData
+                };
+                allUsers.push(newUser);
+                showNotification('用户添加成功', 'success');
+            }
+
+            closeUserModal();
+            filterUsers(); // 重新筛选和渲染
+        }
+
+        // 删除用户
+        function deleteUser(userId) {
+            if (confirm('确定要删除这个用户吗？')) {
+                allUsers = allUsers.filter(u => u.id !== userId);
+                showNotification('用户删除成功', 'success');
+                filterUsers();
+            }
+        }
+
+        // 批量选择
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // 导出用户数据
+        function exportUsers() {
+            const csvContent = generateCSV(filteredUsers);
+            downloadCSV(csvContent, 'users.csv');
+            showNotification('数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['用户ID', 'OpenID', '微信号', '手机号', '首次访问时间', '最新访问时间', '访问次数'];
+            const rows = data.map(user => [
+                user.id,
+                user.openid,
+                user.nickname,
+                user.phone,
+                user.firstVisit,
+                user.lastVisit,
+                user.visitCount
+            ]);
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // 显示导入模态框
+        function showImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+
+        // 关闭导入模态框
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importBtn').disabled = true;
+        }
+
+        // 选择导入文件
+        function selectImportFile() {
+            document.getElementById('importFile').click();
+        }
+
+        // 处理导入文件
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 这里应该解析Excel文件，暂时模拟
+            document.getElementById('importSummary').innerHTML = `
+                <p>文件名：${file.name}</p>
+                <p>文件大小：${(file.size / 1024).toFixed(2)} KB</p>
+                <p>预计导入：模拟数据</p>
+            `;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importBtn').disabled = false;
+        }
+
+        // 导入用户
+        function importUsers() {
+            // 模拟导入过程
+            showNotification('正在导入用户数据...', 'info');
+            setTimeout(() => {
+                showNotification('用户数据导入成功', 'success');
+                closeImportModal();
+                loadUsers();
+            }, 2000);
+        }
+
+        // 切换页面
+        function changePage(page) {
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < Math.ceil(totalUsers / pageSize)) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= Math.ceil(totalUsers / pageSize)) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            .form-control[readonly] {
+                background-color: #f5f5f5 !important;
+                color: #999 !important;
+                cursor: not-allowed;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

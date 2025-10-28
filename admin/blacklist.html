@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黑名单管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link active">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1 class="page-title">黑名单管理</h1>
+                <p class="page-subtitle">管理被限制报名的用户手机号码</p>
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <div class="stats-update-time" id="totalBlacklistTime">刚刚</div>
+                    <div class="stats-number" id="totalBlacklist">0</div>
+                    <div class="stats-label">总黑名单数</div>
+                    <div class="stats-description">系统中所有黑名单记录总数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="activeBlacklistTime">刚刚</div>
+                    <div class="stats-number" id="activeBlacklist">0</div>
+                    <div class="stats-label">生效黑名单数</div>
+                    <div class="stats-description">当前正在生效的黑名单数量</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="inactiveBlacklistTime">刚刚</div>
+                    <div class="stats-number" id="inactiveBlacklist">0</div>
+                    <div class="stats-label">已失效</div>
+                    <div class="stats-description">已经过期或移除的黑名单记录</div>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-danger" onclick="showAddPhoneModal()">
+                        <i class="fas fa-plus"></i> 添加手机号
+                    </button>
+                    <button class="btn btn-warning" onclick="showBatchAddModal()">
+                        <i class="fas fa-plus-square"></i> 批量添加
+                    </button>
+                    <button class="btn btn-success" onclick="exportBlacklist()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <input type="text" class="search-box" placeholder="搜索手机号/姓名/备注" id="searchInput">
+                    <button class="btn btn-secondary" onclick="searchBlacklist()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                    <button class="btn btn-danger" onclick="batchDelete()" id="batchDeleteBtn" disabled>
+                        <i class="fas fa-trash"></i> 批量删除
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>序号</th>
+                                <th>手机号</th>
+                                <th>姓名</th>
+                                <th>添加时间</th>
+                                <th>修改时间</th>
+                                <th>添加人</th>
+                                <th>备注</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blacklistTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加单个手机号模态框 -->
+    <div id="phoneModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="phoneModalTitle">添加手机号到黑名单</h3>
+                <button class="modal-close" onclick="closePhoneModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="phoneForm">
+                    <div class="form-group">
+                        <label class="form-label">手机号 <span class="form-required">*</span></label>
+                        <input type="tel" class="form-control" id="phoneNumber" required 
+                               pattern="^1[3-9]\d{9}$" 
+                               placeholder="请输入11位手机号">
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                            格式：13800138000
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">姓名</label>
+                        <input type="text" class="form-control" id="personName" 
+                               placeholder="请输入姓名（可选）">
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                            用于更好地识别黑名单用户
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-control form-textarea" id="phoneRemark" 
+                                  placeholder="请输入添加到黑名单的原因或备注信息"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">状态</label>
+                        <select class="form-select" id="phoneStatus">
+                            <option value="active">生效中</option>
+                            <option value="inactive">已失效</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePhoneModal()">取消</button>
+                <button class="btn btn-danger" onclick="savePhone()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量添加模态框 -->
+    <div id="batchAddModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">批量添加手机号</h3>
+                <button class="modal-close" onclick="closeBatchAddModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">批量输入手机号</label>
+                    <textarea class="form-control form-textarea" id="batchPhones" 
+                              rows="8" 
+                              placeholder="请输入手机号，每行一个，支持以下格式：&#10;13800138000&#10;13800138001 备注信息&#10;13800138002,备注信息&#10;13800138003 | 备注信息"></textarea>
+                    <div style="font-size: 12px; color: #666; margin-top: 8px;">
+                        支持格式：每行一个手机号，可在手机号后添加空格、逗号或竖线分隔符后跟备注信息
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">默认备注</label>
+                    <input type="text" class="form-control" id="batchRemark" 
+                           placeholder="为没有单独备注的手机号设置统一备注">
+                </div>
+                <div id="batchPreview" style="display: none;">
+                    <h4 style="margin-top: 20px;">预览结果</h4>
+                    <div id="batchSummary" style="padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeBatchAddModal()">取消</button>
+                <button class="btn btn-primary" onclick="previewBatch()">预览</button>
+                <button class="btn btn-danger" id="batchConfirmBtn" onclick="confirmBatchAdd()" disabled>确认添加</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let allBlacklist = [];
+        let filteredBlacklist = [];
+        let editingId = null;
+        let batchPreviewData = [];
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBlacklistStats();
+            loadBlacklist();
+        });
+
+        // API 基础地址
+        const API_BASE = 'http://localhost:3000/api';
+
+        // 加载黑名单统计数据
+        async function loadBlacklistStats() {
+            const refreshTimeElement = document.getElementById('refreshTime');
+            refreshTimeElement.textContent = '加载中...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/blacklist/stats`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const { totalBlacklist, activeBlacklist } = result.data;
+                        const inactiveBlacklist = totalBlacklist - activeBlacklist;
+                        
+                        animateCounter('totalBlacklist', totalBlacklist);
+                        animateCounter('activeBlacklist', activeBlacklist);
+                        animateCounter('inactiveBlacklist', inactiveBlacklist);
+                        
+                        const now = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                        refreshTimeElement.textContent = now;
+                        showNotification('统计数据更新成功', 'success');
+                    } else {
+                        throw new Error(result.message || '获取统计数据失败');
+                    }
+                } else {
+                    throw new Error('API请求失败');
+                }
+            } catch (error) {
+                console.error('加载黑名单统计数据失败:', error);
+                showNotification('加载统计数据失败，使用模拟数据', 'warning');
+                
+                // 使用模拟数据
+                const totalBlacklist = generateMockBlacklist().length;
+                const activeBlacklist = generateMockBlacklist().filter(item => item.status === 'active').length;
+                const inactiveBlacklist = totalBlacklist - activeBlacklist;
+                
+                animateCounter('totalBlacklist', totalBlacklist);
+                animateCounter('activeBlacklist', activeBlacklist);
+                animateCounter('inactiveBlacklist', inactiveBlacklist);
+                refreshTimeElement.textContent = '模拟';
+            }
+        }
+
+        // 数字动画
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 800;
+            const increment = targetValue / (duration / 16);
+            let currentValue = 0;
+
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue);
+            }, 16);
+        }
+
+        // 模拟黑名单数据
+        function generateMockBlacklist() {
+            const mockData = [];
+            const names = [
+                '张三', '李四', '王五', '赵六', '孙七', '周八', '吴九', '郑十',
+                '陈一', '刘二', '杨三', '黄四', '马五', '朱六', '胡七', '林八',
+                '高九', '梁十', '徐一', '郭二', '罗三', '宋四', '谢五', '唐六'
+            ];
+            const reasons = [
+                '违反考试纪律',
+                '提供虚假信息', 
+                '恶意刷单',
+                '扰乱课堂秩序',
+                '拖欠学费',
+                '恶意投诉',
+                '违约行为',
+                '不当言论'
+            ];
+            const operators = ['管理员', '系统', 'admin', '客服'];
+            
+            for (let i = 1; i <= 45; i++) {
+                const addTime = new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000);
+                const modifyTime = new Date(addTime.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000);
+                mockData.push({
+                    id: i,
+                    phone: `138${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
+                    name: names[Math.floor(Math.random() * names.length)] + (i > 20 ? i : ''),
+                    idCard: `${Math.floor(Math.random() * 900000 + 100000)}${Math.floor(Math.random() * 90000000 + 10000000)}`,
+                    addTime: addTime.toISOString().slice(0, 19).replace('T', ' '),
+                    modifyTime: modifyTime.toISOString().slice(0, 19).replace('T', ' '),
+                    addBy: operators[Math.floor(Math.random() * operators.length)],
+                    remark: reasons[Math.floor(Math.random() * reasons.length)],
+                    status: Math.random() > 0.15 ? 'active' : 'inactive',
+                    reason: reasons[Math.floor(Math.random() * reasons.length)],
+                    expiryTime: new Date(addTime.getTime() + (Math.random() * 365 + 180) * 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
+                    creator: '管理员'
+                });
+            }
+            return mockData.sort((a, b) => new Date(b.addTime) - new Date(a.addTime));
+        }
+
+        // 加载黑名单数据
+        function loadBlacklist() {
+            allBlacklist = generateMockBlacklist();
+            filteredBlacklist = [...allBlacklist];
+            totalItems = filteredBlacklist.length;
+            renderTable();
+            updatePagination();
+        }
+
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('blacklistTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredBlacklist.slice(start, end);
+
+            tbody.innerHTML = pageData.map((item, index) => `
+                <tr>
+                    <td><input type="checkbox" class="item-checkbox" value="${item.id}"></td>
+                    <td>${start + index + 1}</td>
+                    <td><strong>${item.phone}</strong></td>
+                    <td>${item.name}</td>
+                    <td>${item.addTime}</td>
+                    <td>${item.modifyTime}</td>
+                    <td>${item.addBy}</td>
+                    <td title="${item.remark}">${item.remark.length > 20 ? item.remark.substr(0, 20) + '...' : item.remark}</td>
+                    <td><span class="status-badge status-${item.status}">${item.status === 'active' ? '生效中' : '已失效'}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="editPhone(${item.id})" title="编辑">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm ${item.status === 'active' ? 'btn-warning' : 'btn-success'}" 
+                                onclick="toggleStatus(${item.id})" 
+                                title="${item.status === 'active' ? '禁用' : '启用'}">
+                            <i class="fas fa-${item.status === 'active' ? 'ban' : 'check'}"></i>
+                            ${item.status === 'active' ? '禁用' : '启用'}
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deletePhone(${item.id})" title="删除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // 更新批量删除按钮状态
+            updateBatchDeleteButton();
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalItems;
+        }
+
+        // 搜索黑名单
+        function searchBlacklist() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            filteredBlacklist = allBlacklist.filter(item => 
+                item.phone.includes(searchTerm) ||
+                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.remark.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            totalItems = filteredBlacklist.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示添加手机号模态框
+        function showAddPhoneModal() {
+            editingId = null;
+            document.getElementById('phoneModalTitle').textContent = '添加手机号到黑名单';
+            document.getElementById('phoneForm').reset();
+            document.getElementById('phoneModal').style.display = 'block';
+        }
+
+        // 关闭手机号模态框
+        function closePhoneModal() {
+            document.getElementById('phoneModal').style.display = 'none';
+            editingId = null;
+        }
+
+        // 编辑手机号
+        function editPhone(id) {
+            const item = allBlacklist.find(p => p.id === id);
+            if (!item) return;
+
+            editingId = id;
+            document.getElementById('phoneModalTitle').textContent = '编辑黑名单信息';
+            document.getElementById('phoneNumber').value = item.phone;
+            document.getElementById('personName').value = item.name === '-' ? '' : item.name;
+            document.getElementById('phoneRemark').value = item.remark;
+            document.getElementById('phoneStatus').value = item.status;
+            document.getElementById('phoneModal').style.display = 'block';
+        }
+
+        // 保存手机号
+        function savePhone() {
+            const phone = document.getElementById('phoneNumber').value.trim();
+            const name = document.getElementById('personName').value.trim() || '-';
+            const remark = document.getElementById('phoneRemark').value.trim();
+            const status = document.getElementById('phoneStatus').value;
+
+            // 验证手机号格式
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                alert('请输入正确的手机号格式');
+                return;
+            }
+
+            // 检查重复
+            const existing = allBlacklist.find(item => item.phone === phone && item.id !== editingId);
+            if (existing) {
+                alert('该手机号已在黑名单中');
+                return;
+            }
+
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            if (editingId) {
+                // 编辑模式
+                const itemIndex = allBlacklist.findIndex(p => p.id === editingId);
+                allBlacklist[itemIndex] = {
+                    ...allBlacklist[itemIndex],
+                    phone,
+                    name,
+                    remark,
+                    status,
+                    modifyTime: now
+                };
+                showNotification('黑名单信息更新成功', 'success');
+            } else {
+                // 新增模式
+                const newItem = {
+                    id: Math.max(...allBlacklist.map(p => p.id), 0) + 1,
+                    phone,
+                    name,
+                    remark: remark || '手动添加',
+                    addTime: now,
+                    modifyTime: now,
+                    addBy: '管理员',
+                    status
+                };
+                allBlacklist.unshift(newItem);
+                showNotification('手机号添加到黑名单成功', 'success');
+            }
+
+            closePhoneModal();
+            searchBlacklist(); // 重新搜索和渲染
+            // 重新加载统计数据
+            loadBlacklistStats();
+        }
+
+        // 切换状态
+        function toggleStatus(id) {
+            const item = allBlacklist.find(p => p.id === id);
+            if (!item) return;
+
+            item.status = item.status === 'active' ? 'inactive' : 'active';
+            item.modifyTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            showNotification(`手机号${item.status === 'active' ? '已启用' : '已禁用'}`, 'success');
+            renderTable();
+            // 重新加载统计数据
+            loadBlacklistStats();
+        }
+
+        // 删除手机号
+        function deletePhone(id) {
+            const item = allBlacklist.find(p => p.id === id);
+            if (!item) return;
+
+            if (confirm(`确定要删除手机号 ${item.phone} 吗？`)) {
+                allBlacklist = allBlacklist.filter(p => p.id !== id);
+                showNotification('手机号已从黑名单中删除', 'success');
+                searchBlacklist();
+                // 重新加载统计数据
+                loadBlacklistStats();
+            }
+        }
+
+        // 批量选择
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateBatchDeleteButton();
+        }
+
+        // 更新批量删除按钮
+        function updateBatchDeleteButton() {
+            const checked = document.querySelectorAll('.item-checkbox:checked').length;
+            const batchBtn = document.getElementById('batchDeleteBtn');
+            batchBtn.disabled = checked === 0;
+            batchBtn.textContent = checked > 0 ? `批量删除 (${checked})` : '批量删除';
+        }
+
+        // 监听复选框变化
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('item-checkbox')) {
+                updateBatchDeleteButton();
+            }
+        });
+
+        // 批量删除
+        function batchDelete() {
+            const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+            if (checkboxes.length === 0) return;
+
+            if (confirm(`确定要删除选中的 ${checkboxes.length} 个手机号吗？`)) {
+                const idsToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                allBlacklist = allBlacklist.filter(item => !idsToDelete.includes(item.id));
+                showNotification(`成功删除 ${checkboxes.length} 个手机号`, 'success');
+                searchBlacklist();
+                document.getElementById('selectAll').checked = false;
+                // 重新加载统计数据
+                loadBlacklistStats();
+            }
+        }
+
+        // 显示批量添加模态框
+        function showBatchAddModal() {
+            document.getElementById('batchAddModal').style.display = 'block';
+            document.getElementById('batchPhones').value = '';
+            document.getElementById('batchRemark').value = '';
+            document.getElementById('batchPreview').style.display = 'none';
+            document.getElementById('batchConfirmBtn').disabled = true;
+        }
+
+        // 关闭批量添加模态框
+        function closeBatchAddModal() {
+            document.getElementById('batchAddModal').style.display = 'none';
+            batchPreviewData = [];
+        }
+
+        // 预览批量添加
+        function previewBatch() {
+            const batchText = document.getElementById('batchPhones').value.trim();
+            const defaultRemark = document.getElementById('batchRemark').value.trim() || '批量添加';
+            
+            if (!batchText) {
+                alert('请输入手机号');
+                return;
+            }
+
+            const lines = batchText.split('\n').filter(line => line.trim());
+            batchPreviewData = [];
+            let validCount = 0;
+            let invalidCount = 0;
+            let duplicateCount = 0;
+
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                let phone, remark;
+                
+                // 解析不同分隔符
+                if (trimmed.includes(' ')) {
+                    [phone, ...remark] = trimmed.split(' ');
+                    remark = remark.join(' ').trim() || defaultRemark;
+                } else if (trimmed.includes(',')) {
+                    [phone, remark] = trimmed.split(',');
+                    remark = (remark || '').trim() || defaultRemark;
+                } else if (trimmed.includes('|')) {
+                    [phone, remark] = trimmed.split('|');
+                    remark = (remark || '').trim() || defaultRemark;
+                } else {
+                    phone = trimmed;
+                    remark = defaultRemark;
+                }
+
+                phone = phone.trim();
+
+                // 验证手机号
+                if (!/^1[3-9]\d{9}$/.test(phone)) {
+                    batchPreviewData.push({ phone, remark, status: 'invalid', reason: '格式错误' });
+                    invalidCount++;
+                } else if (allBlacklist.some(item => item.phone === phone)) {
+                    batchPreviewData.push({ phone, remark, status: 'duplicate', reason: '已存在' });
+                    duplicateCount++;
+                } else if (batchPreviewData.some(item => item.phone === phone && item.status === 'valid')) {
+                    batchPreviewData.push({ phone, remark, status: 'duplicate', reason: '批次内重复' });
+                    duplicateCount++;
+                } else {
+                    batchPreviewData.push({ phone, remark, status: 'valid' });
+                    validCount++;
+                }
+            });
+
+            // 显示预览结果
+            document.getElementById('batchSummary').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 20px; font-weight: bold; color: #52c41a;">${validCount}</div>
+                        <div style="font-size: 12px; color: #666;">有效</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 20px; font-weight: bold; color: #faad14;">${duplicateCount}</div>
+                        <div style="font-size: 12px; color: #666;">重复</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 20px; font-weight: bold; color: #ff4d4f;">${invalidCount}</div>
+                        <div style="font-size: 12px; color: #666;">无效</div>
+                    </div>
+                </div>
+                ${batchPreviewData.map(item => `
+                    <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f0f0f0;">
+                        <span>${item.phone}</span>
+                        <span style="color: ${item.status === 'valid' ? '#52c41a' : item.status === 'duplicate' ? '#faad14' : '#ff4d4f'};">
+                            ${item.status === 'valid' ? '✓' : item.reason}
+                        </span>
+                    </div>
+                `).join('')}
+            `;
+            
+            document.getElementById('batchPreview').style.display = 'block';
+            document.getElementById('batchConfirmBtn').disabled = validCount === 0;
+        }
+
+        // 确认批量添加
+        function confirmBatchAdd() {
+            const validItems = batchPreviewData.filter(item => item.status === 'valid');
+            if (validItems.length === 0) return;
+
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            const newItems = validItems.map((item, index) => ({
+                id: Math.max(...allBlacklist.map(p => p.id), 0) + index + 1,
+                phone: item.phone,
+                name: Math.random() > 0.5 ? 
+                    ['张三', '李四', '王五', '赵六', '孙七', '周八'][Math.floor(Math.random() * 6)] + 
+                    (Math.floor(Math.random() * 90) + 10) : '-',
+                remark: item.remark,
+                addTime: now,
+                modifyTime: now,
+                addBy: '管理员',
+                status: 'active'
+            }));
+
+            allBlacklist = [...newItems, ...allBlacklist];
+            showNotification(`成功添加 ${validItems.length} 个手机号到黑名单`, 'success');
+            closeBatchAddModal();
+            searchBlacklist();
+            // 重新加载统计数据
+            loadBlacklistStats();
+        }
+
+        // 导出黑名单
+        function exportBlacklist() {
+            const csvContent = generateCSV(filteredBlacklist);
+            downloadCSV(csvContent, 'blacklist.csv');
+            showNotification('黑名单数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['序号', '手机号', '姓名', '添加时间', '修改时间', '添加人', '备注', '状态'];
+            const rows = data.map((item, index) => [
+                index + 1,
+                item.phone,
+                item.name,
+                item.addTime,
+                item.modifyTime,
+                item.addBy,
+                item.remark,
+                item.status === 'active' ? '生效中' : '已失效'
+            ]);
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

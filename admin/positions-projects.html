@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>招考岗位管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link active">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1 class="page-title">招考岗位管理</h1>
+                <p class="page-subtitle">选择项目查看对应的招考岗位信息和管理功能</p>
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 项目卡片网格 -->
+            <div class="project-grid">
+                <!-- 项目卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 项目卡片网格样式 */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            padding: 20px 0;
+        }
+
+        /* 项目卡片样式 */
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .project-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 8px 24px rgba(52,152,219,0.2);
+            transform: translateY(-4px);
+        }
+
+        .project-card-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .project-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-card-type {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .project-card-body {
+            padding: 20px 24px;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .project-stat {
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .project-stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .project-stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        .project-card-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .project-status.active {
+            color: #27ae60;
+        }
+
+        .project-status.inactive {
+            color: #e74c3c;
+        }
+
+        .project-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .project-manage-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .project-manage-btn:hover {
+            background: #2980b9;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #5a6c7d;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 模拟项目数据
+        function generateMockProjects() {
+            return [
+                {
+                    id: 1,
+                    name: '2024年选调生培训',
+                    type: '选调生',
+                    status: 'active',
+                    totalPositions: 45,
+                    recruitingPositions: 32
+                },
+                {
+                    id: 2,
+                    name: '2024年省考培训',
+                    type: '省考',
+                    status: 'active',
+                    totalPositions: 78,
+                    recruitingPositions: 65
+                },
+                {
+                    id: 3,
+                    name: '2024年申论专项培训',
+                    type: '申论',
+                    status: 'active',
+                    totalPositions: 23,
+                    recruitingPositions: 18
+                },
+                {
+                    id: 4,
+                    name: '2024年国考培训',
+                    type: '国考',
+                    status: 'inactive',
+                    totalPositions: 156,
+                    recruitingPositions: 0
+                },
+                {
+                    id: 5,
+                    name: '2024年事业单位培训',
+                    type: '事业单位',
+                    status: 'active',
+                    totalPositions: 89,
+                    recruitingPositions: 67
+                }
+            ];
+        }
+
+        // 渲染项目卡片
+        function renderProjectCards() {
+            const projects = generateMockProjects();
+            const projectGrid = document.querySelector('.project-grid');
+
+            if (projects.length === 0) {
+                projectGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>暂无项目</h3>
+                        <p>还没有创建任何项目，请先到项目管理中创建项目</p>
+                    </div>
+                `;
+                return;
+            }
+
+            projectGrid.innerHTML = projects.map(project => `
+                <div class="project-card" onclick="enterProjectPositions(${project.id}, '${project.name}')">
+                    <div class="project-card-header">
+                        <div class="project-card-title">
+                            <i class="fas fa-briefcase"></i>
+                            ${project.name}
+                        </div>
+                        <span class="project-card-type">${project.type}</span>
+                    </div>
+                    <div class="project-card-body">
+                        <div class="project-stats">
+                            <div class="project-stat">
+                                <span class="project-stat-number">${project.totalPositions}</span>
+                                <div class="project-stat-label">总岗位数</div>
+                            </div>
+                            <div class="project-stat">
+                                <span class="project-stat-number">${project.recruitingPositions}</span>
+                                <div class="project-stat-label">招录中</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card-footer">
+                        <div class="project-status ${project.status}">
+                            <span class="project-status-dot"></span>
+                            ${project.status === 'active' ? '进行中' : '已结束'}
+                        </div>
+                        <button class="project-manage-btn" onclick="event.stopPropagation(); enterProjectPositions(${project.id}, '${project.name}')">
+                            <i class="fas fa-cog"></i>
+                            管理岗位
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 进入项目岗位管理页面
+        function enterProjectPositions(projectId, projectName) {
+            // 跳转到具体的岗位管理页面，传递项目ID和名称
+            window.location.href = `positions-detail.html?projectId=${projectId}&projectName=${encodeURIComponent(projectName)}`;
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProjectCards();
+        });
+    </script>
+</body>
+</html>

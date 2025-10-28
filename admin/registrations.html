@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报名管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations.html" class="nav-link active">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1 class="page-title">报名管理</h1>
+                <p class="page-subtitle">查看和管理用户报名信息及审核状态</p>
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-success" onclick="exportRegistrations()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn btn-info" onclick="batchApprove()" id="batchApproveBtn" disabled>
+                        <i class="fas fa-check"></i> 批量审核
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <select class="form-select" style="width: 150px;" onchange="filterRegistrations()" id="projectFilter">
+                        <option value="">全部项目</option>
+                    </select>
+                    <select class="form-select" style="width: 150px;" onchange="filterRegistrations()" id="classFilter">
+                        <option value="">全部班型</option>
+                    </select>
+                    <select class="form-select" style="width: 120px;" onchange="filterRegistrations()" id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="pending">待审核</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已拒绝</option>
+                        <option value="paid">已缴费</option>
+                    </select>
+                    <input type="text" class="search-box" placeholder="搜索姓名/手机号" id="searchInput" onkeyup="searchRegistrations()">
+                </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <div class="stats-update-time" id="totalRegistrationsTime">刚刚</div>
+                    <div class="stats-number" id="totalRegistrations">0</div>
+                    <div class="stats-label">总报名数</div>
+                    <div class="stats-description">所有用户提交的报名申请总数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="pendingRegistrationsTime">刚刚</div>
+                    <div class="stats-number" id="pendingRegistrations">0</div>
+                    <div class="stats-label">待审核</div>
+                    <div class="stats-description">等待管理员审核的报名申请</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="approvedRegistrationsTime">刚刚</div>
+                    <div class="stats-number" id="approvedRegistrations">0</div>
+                    <div class="stats-label">已通过</div>
+                    <div class="stats-description">审核通过的有效报名数量</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="totalRevenueTime">刚刚</div>
+                    <div class="stats-number" id="totalRevenue">¥0</div>
+                    <div class="stats-label">总收入</div>
+                    <div class="stats-description">所有已缴费报名的收入总额</div>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>报名ID</th>
+                                <th>学员信息</th>
+                                <th>报名项目</th>
+                                <th>选择班型</th>
+                                <th>费用信息</th>
+                                <th>报名时间</th>
+                                <th>审核状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registrationTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑报名模态框 -->
+    <div id="registrationModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="registrationModalTitle">新增报名</h3>
+                <button class="modal-close" onclick="closeRegistrationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="registrationForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">学员姓名 <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="studentName" required placeholder="请输入学员姓名">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">手机号 <span class="form-required">*</span></label>
+                            <input type="tel" class="form-control" id="phone" required 
+                                   pattern="^1[3-9]\d{9}$" placeholder="请输入手机号">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">身份证号 <span class="form-required">*</span></label>
+                            <input type="text" class="form-control" id="idCard" required placeholder="请输入身份证号">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" class="form-control" id="email" placeholder="请输入邮箱地址">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">报名项目 <span class="form-required">*</span></label>
+                            <select class="form-select" id="projectId" required onchange="loadProjectClasses()">
+                                <option value="">请选择项目</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">选择班型 <span class="form-required">*</span></label>
+                            <select class="form-select" id="classId" required onchange="calculateFee()">
+                                <option value="">请先选择项目</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">学历</label>
+                            <select class="form-select" id="education">
+                                <option value="">请选择学历</option>
+                                <option value="高中">高中</option>
+                                <option value="大专">大专</option>
+                                <option value="本科">本科</option>
+                                <option value="硕士">硕士</option>
+                                <option value="博士">博士</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">工作单位</label>
+                            <input type="text" class="form-control" id="workplace" placeholder="请输入工作单位">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">通讯地址</label>
+                        <input type="text" class="form-control" id="address" placeholder="请输入详细地址">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注信息</label>
+                        <textarea class="form-control form-textarea" id="remarks" 
+                                  placeholder="其他需要说明的信息"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">所享优惠</label>
+                            <select class="form-select" id="discountType" onchange="updatePaymentFields()">
+                                <option value="">无优惠</option>
+                                <option value="defender">守擂优惠</option>
+                                <option value="old_student">老学员优惠</option>
+                                <option value="referral">老学员推荐优惠</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">优惠金额</label>
+                            <input type="number" class="form-control" id="discountAmount" 
+                                   min="0" step="0.01" placeholder="0.00" onchange="updatePaymentFields()">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">应缴费用</label>
+                            <input type="number" class="form-control" id="totalFee" readonly placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">首款应缴</label>
+                            <input type="number" class="form-control" id="firstPaymentDue" 
+                                   min="0" step="0.01" placeholder="0.00" oninput="updatePaymentFields()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">首款已收</label>
+                            <input type="number" class="form-control" id="firstPaymentReceived" 
+                                   min="0" step="0.01" placeholder="0.00" oninput="updatePaymentFields()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">尾款待缴</label>
+                        <input type="number" class="form-control" id="tailPaymentDue" readonly placeholder="0.00">
+                    </div>
+                    <input type="hidden" id="actualFee">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">审核状态</label>
+                            <select class="form-select" id="status">
+                                <option value="pending">待审核</option>
+                                <option value="approved">已通过</option>
+                                <option value="rejected">已拒绝</option>
+                                <option value="paid">已缴费</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">首款状态</label>
+                            <select class="form-select" id="firstPaymentStatus">
+                                <option value="pending">待缴费</option>
+                                <option value="paid">已缴费</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRegistrationModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveRegistration()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看详情模态框 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">报名详情</h3>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="detailContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入数据模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">导入报名数据</h3>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload" onclick="selectImportFile()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                    <div class="file-upload-text">点击选择Excel文件或拖拽到此处</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        支持.xlsx/.xls格式，文件大小不超过10MB
+                    </div>
+                </div>
+                <input type="file" id="importFile" accept=".xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                
+                <div id="importPreview" style="display: none; margin-top: 20px;">
+                    <h4>导入预览</h4>
+                    <div id="importSummary"></div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>导入说明：</h5>
+                    <ul style="margin: 10px 0; padding-left: 20px; font-size: 14px; color: #666;">
+                        <li>Excel第一行应为列标题：姓名、手机号、身份证号、邮箱、项目名称、班型名称</li>
+                        <li>姓名、手机号、身份证号为必填项</li>
+                        <li>项目名称和班型名称必须在系统中存在</li>
+                        <li>重复身份证号将被跳过</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" id="importBtn" onclick="importRegistrations()" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let allRegistrations = [];
+        let filteredRegistrations = [];
+        let editingRegistrationId = null;
+        let allProjects = [];
+        let allClasses = [];
+        const DISCOUNT_TYPE_LABELS = {
+            defender: '守擂优惠',
+            old_student: '老学员优惠',
+            referral: '老学员推荐优惠'
+        };
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面DOM加载完成');
+            try {
+                loadProjects();
+                loadClasses();
+                loadRegistrations();
+                console.log('初始化完成');
+            } catch (error) {
+                console.error('初始化过程中发生错误:', error);
+                alert('页面初始化失败，请刷新页面重试');
+            }
+        });
+
+        // 全局错误处理器
+        window.addEventListener('error', function(event) {
+            console.error('JavaScript错误:', event.error);
+            console.error('错误文件:', event.filename);
+            console.error('错误行号:', event.lineno);
+        });
+
+        // 添加点击事件的调试信息
+        document.addEventListener('click', function(event) {
+            if (event.target.closest('.btn')) {
+                console.log('按钮点击事件:', event.target);
+            }
+        });
+
+        // 模拟项目数据
+        function generateMockProjects() {
+            return [
+                { id: 1, name: '2024年选调生培训', type: '选调生' },
+                { id: 2, name: '2024年省考培训', type: '省考' },
+                { id: 3, name: '2024年申论专项培训', type: '申论' },
+                { id: 4, name: '2024年国考培训', type: '国考' },
+                { id: 5, name: '2024年事业单位培训', type: '事业单位' }
+            ];
+        }
+
+        // 模拟班型数据
+        function generateMockClasses() {
+            const classTypes = ['普通班', 'VIP班', '强化班', '周末班', '网络班'];
+            const projects = generateMockProjects();
+            const mockData = [];
+            
+            projects.forEach(project => {
+                classTypes.forEach((type, index) => {
+                    mockData.push({
+                        id: project.id * 10 + index + 1,
+                        name: `${project.name} ${type}`,
+                        projectId: project.id,
+                        projectName: project.name,
+                        fee: Math.floor(Math.random() * 3000) + 1000,
+                        type: type
+                    });
+                });
+            });
+            return mockData;
+        }
+
+        // 模拟报名数据
+        function generateMockRegistrations() {
+            const names = ['张三', '李四', '王五', '赵六', '孙七', '周八', '吴九', '郑十', '刘一', '陈二'];
+            const educations = ['高中', '大专', '本科', '硕士', '博士'];
+            const statuses = ['pending', 'approved', 'rejected', 'paid'];
+            const discountTypes = ['', 'defender', 'old_student', 'referral'];
+            const mockData = [];
+            
+            for (let i = 1; i <= 50; i++) {
+                const registrationTime = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+                const project = allProjects[Math.floor(Math.random() * allProjects.length)];
+                const projectClasses = allClasses.filter(c => c.projectId === project.id);
+                const selectedClass = projectClasses[Math.floor(Math.random() * projectClasses.length)];
+                const discountType = discountTypes[Math.floor(Math.random() * discountTypes.length)];
+                const discountAmount = discountType ? Math.floor(Math.random() * 500) : 0;
+                const netAmount = Math.max(selectedClass.fee - discountAmount, 0);
+                const firstPaymentDue = netAmount > 0 ? parseFloat((netAmount * (0.3 + Math.random() * 0.2)).toFixed(2)) : 0;
+                const firstPaymentReceived = Math.random() > 0.6 ? firstPaymentDue : parseFloat((firstPaymentDue * Math.random()).toFixed(2));
+                const tailPaymentDue = parseFloat(Math.max(netAmount - firstPaymentReceived, 0).toFixed(2));
+                const firstPaymentStatus = firstPaymentReceived >= firstPaymentDue && firstPaymentDue > 0 ? 'paid' : 'pending';
+                
+                mockData.push({
+                    id: i,
+                    studentName: names[Math.floor(Math.random() * names.length)] + i,
+                    phone: `138${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
+                    idCard: `1101${(1950 + Math.floor(Math.random() * 50)).toString()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+                    email: `student${i}@example.com`,
+                    projectId: project.id,
+                    projectName: project.name,
+                    classId: selectedClass.id,
+                    className: selectedClass.name,
+                    education: educations[Math.floor(Math.random() * educations.length)],
+                    workplace: `单位${i}`,
+                    address: `地址${i}号`,
+                    remarks: Math.random() > 0.5 ? `备注信息${i}` : '',
+                    totalFee: selectedClass.fee,
+                    discountAmount: discountAmount,
+                    discountType: discountType,
+                    actualFee: netAmount,
+                    firstPaymentDue: firstPaymentDue,
+                    firstPaymentReceived: firstPaymentReceived,
+                    tailPaymentDue: tailPaymentDue,
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    firstPaymentStatus: firstPaymentStatus,
+                    registrationTime: registrationTime.toISOString().slice(0, 19).replace('T', ' '),
+                    approver: Math.random() > 0.5 ? '管理员' : '',
+                    approveTime: Math.random() > 0.5 ? new Date(registrationTime.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ') : '',
+                    discountTypeLabel: discountType ? DISCOUNT_TYPE_LABELS[discountType] : ''
+                });
+            }
+            return mockData.sort((a, b) => new Date(b.registrationTime) - new Date(a.registrationTime));
+        }
+
+        // 加载项目数据
+        function loadProjects() {
+            allProjects = generateMockProjects();
+            
+            // 填充项目筛选选项
+            const projectFilter = document.getElementById('projectFilter');
+            const projectSelect = document.getElementById('projectId');
+            
+            allProjects.forEach(project => {
+                // 筛选选项
+                const option1 = document.createElement('option');
+                option1.value = project.id;
+                option1.textContent = project.name;
+                projectFilter.appendChild(option1);
+                
+                // 表单选项
+                const option2 = document.createElement('option');
+                option2.value = project.id;
+                option2.textContent = project.name;
+                projectSelect.appendChild(option2);
+            });
+        }
+
+        // 加载班型数据
+        function loadClasses() {
+            allClasses = generateMockClasses();
+            
+            // 填充班型筛选选项
+            const classFilter = document.getElementById('classFilter');
+            allClasses.forEach(classItem => {
+                const option = document.createElement('option');
+                option.value = classItem.id;
+                option.textContent = classItem.name;
+                classFilter.appendChild(option);
+            });
+        }
+
+        // 加载项目对应的班型
+        function loadProjectClasses() {
+            const projectId = parseInt(document.getElementById('projectId').value);
+            const classSelect = document.getElementById('classId');
+            
+            // 清空班型选项
+            classSelect.innerHTML = '<option value="">请选择班型</option>';
+            
+            if (projectId) {
+                const projectClasses = allClasses.filter(c => c.projectId === projectId);
+                projectClasses.forEach(classItem => {
+                    const option = document.createElement('option');
+                    option.value = classItem.id;
+                    option.textContent = classItem.type;
+                    option.dataset.fee = classItem.fee;
+                    classSelect.appendChild(option);
+                });
+            }
+            
+            calculateFee();
+        }
+
+        // 计算费用
+        function calculateFee() {
+            const classSelect = document.getElementById('classId');
+            const selectedOption = classSelect.options[classSelect.selectedIndex];
+            
+            if (selectedOption && selectedOption.dataset.fee) {
+                const totalFee = parseFloat(selectedOption.dataset.fee);
+                document.getElementById('totalFee').value = totalFee.toFixed(2);
+            } else {
+                document.getElementById('totalFee').value = '';
+            }
+            updatePaymentFields();
+        }
+
+        function updatePaymentFields() {
+            const totalFee = parseFloat(document.getElementById('totalFee').value) || 0;
+            const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+            const netAmount = Math.max(totalFee - discountAmount, 0);
+
+            const firstPaymentDueInput = document.getElementById('firstPaymentDue');
+            const firstPaymentReceivedInput = document.getElementById('firstPaymentReceived');
+            const tailPaymentDueInput = document.getElementById('tailPaymentDue');
+            const actualFeeInput = document.getElementById('actualFee');
+
+            let firstPaymentDue = parseFloat(firstPaymentDueInput.value);
+            if (isNaN(firstPaymentDue) || firstPaymentDue < 0) {
+                firstPaymentDue = 0;
+            }
+            if (firstPaymentDue > netAmount) {
+                firstPaymentDue = netAmount;
+            }
+
+            let firstPaymentReceived = parseFloat(firstPaymentReceivedInput.value);
+            if (isNaN(firstPaymentReceived) || firstPaymentReceived < 0) {
+                firstPaymentReceived = 0;
+            }
+            if (firstPaymentReceived > firstPaymentDue) {
+                firstPaymentReceived = firstPaymentDue;
+            }
+
+            const tailPaymentDue = Math.max(netAmount - firstPaymentReceived, 0);
+
+            firstPaymentDueInput.value = firstPaymentDue ? firstPaymentDue.toFixed(2) : '';
+            firstPaymentReceivedInput.value = firstPaymentReceived ? firstPaymentReceived.toFixed(2) : '';
+            tailPaymentDueInput.value = tailPaymentDue ? tailPaymentDue.toFixed(2) : '';
+            actualFeeInput.value = netAmount ? netAmount.toFixed(2) : '';
+
+            const firstPaymentStatusSelect = document.getElementById('firstPaymentStatus');
+            if (firstPaymentStatusSelect) {
+                if (firstPaymentDue > 0 && firstPaymentReceived >= firstPaymentDue) {
+                    firstPaymentStatusSelect.value = 'paid';
+                } else if (firstPaymentStatusSelect.value === 'paid') {
+                    firstPaymentStatusSelect.value = 'pending';
+                }
+            }
+        }
+
+        // 加载报名数据
+        function loadRegistrations() {
+            allRegistrations = generateMockRegistrations();
+            filteredRegistrations = [...allRegistrations];
+            totalItems = filteredRegistrations.length;
+            renderTable();
+            updatePagination();
+            updateStatistics();
+        }
+
+        // 更新统计信息
+        function updateStatistics() {
+            const total = allRegistrations.length;
+            const pending = allRegistrations.filter(r => r.status === 'pending').length;
+            const approved = allRegistrations.filter(r => r.status === 'approved' || r.status === 'paid').length;
+            const totalRevenue = allRegistrations
+                .filter(r => r.firstPaymentStatus === 'paid')
+                .reduce((sum, r) => sum + (parseFloat(r.firstPaymentReceived) || 0), 0);
+            
+            animateCounter('totalRegistrations', total);
+            animateCounter('pendingRegistrations', pending);
+            animateCounter('approvedRegistrations', approved);
+            document.getElementById('totalRevenue').textContent = '¥' + totalRevenue.toLocaleString();
+        }
+
+        // 数字动画
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 800;
+            const increment = targetValue / (duration / 16);
+            let currentValue = 0;
+
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue);
+            }, 16);
+        }
+
+        // 获取状态信息
+        function getStatusInfo(status) {
+            switch(status) {
+                case 'pending':
+                    return { text: '待审核', class: 'status-warning' };
+                case 'approved':
+                    return { text: '已通过', class: 'status-active' };
+                case 'rejected':
+                    return { text: '已拒绝', class: 'status-inactive' };
+                case 'paid':
+                    return { text: '已缴费', class: 'status-success' };
+                default:
+                    return { text: status, class: 'status-pending' };
+            }
+        }
+
+        // 获取首款状态信息
+        function getPaymentStatusInfo(status) {
+            switch(status) {
+                case 'pending':
+                    return { text: '待缴费', class: 'status-warning' };
+                case 'paid':
+                    return { text: '已缴费', class: 'status-success' };
+                default:
+                    return { text: '待缴费', class: 'status-warning' };
+            }
+        }
+
+        function formatAmount(value) {
+            const numeric = parseFloat(value);
+            if (isNaN(numeric)) {
+                return '0.00';
+            }
+            return numeric.toFixed(2);
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('registrationTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredRegistrations.slice(start, end);
+
+            tbody.innerHTML = pageData.map(registration => {
+                const statusInfo = getStatusInfo(registration.status);
+                const paymentInfo = getPaymentStatusInfo(registration.firstPaymentStatus);
+                const discountLabel = registration.discountType ? (registration.discountTypeLabel || DISCOUNT_TYPE_LABELS[registration.discountType]) : '';
+                
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="registration-checkbox" value="${registration.id}"></td>
+                        <td>${registration.id}</td>
+                        <td>
+                            <div style="font-weight: bold; margin-bottom: 3px;">${registration.studentName}</div>
+                            <div style="font-size: 12px; color: #666;">${registration.phone}</div>
+                            <div style="font-size: 11px; color: #999;">${registration.education || ''} ${registration.workplace || ''}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: bold; margin-bottom: 3px;">${registration.projectName}</div>
+                            <div style="font-size: 12px; color: #666;">报名时间：${registration.registrationTime.split(' ')[0]}</div>
+                        </td>
+                        <td>
+                            <div style="margin-bottom: 3px;">${registration.className}</div>
+                            <div style="font-size: 11px; color: #666;">学费：¥${registration.totalFee}</div>
+                        </td>
+                        <td>
+                            <div style="margin-bottom: 3px;">应缴：¥${formatAmount(registration.totalFee)}</div>
+                            ${discountLabel ? `<div style="font-size: 11px; color: #f39c12;">优惠：${discountLabel}${registration.discountAmount ? ` -¥${formatAmount(registration.discountAmount)}` : ''}</div>` : ''}
+                            <div style="font-size: 11px; color: #34495e;">首款应缴：¥${formatAmount(registration.firstPaymentDue)}</div>
+                            <div style="font-size: 11px; color: #2c3e50;">首款已收：¥${formatAmount(registration.firstPaymentReceived)}</div>
+                            <div style="font-size: 11px; color: #e67e22;">尾款待缴：¥${formatAmount(registration.tailPaymentDue)}</div>
+                            <div style="margin-top: 4px;"><span class="status-badge ${paymentInfo.class}" style="font-size: 10px;">${paymentInfo.text}</span></div>
+                        </td>
+                        <td>${registration.registrationTime}</td>
+                        <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-info" onclick="viewDetail(${registration.id})" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="editRegistration(${registration.id})" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${registration.status === 'pending' ? `
+                                <button class="btn btn-sm btn-success" onclick="approveRegistration(${registration.id})" title="通过">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="rejectRegistration(${registration.id})" title="拒绝">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-sm btn-danger" onclick="deleteRegistration(${registration.id})" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // 更新批量审核按钮状态
+            updateBatchApproveButton();
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalItems;
+        }
+
+        // 搜索报名
+        function searchRegistrations() {
+            applyFilters();
+        }
+
+        // 筛选报名
+        function filterRegistrations() {
+            applyFilters();
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const projectFilter = document.getElementById('projectFilter').value;
+            const classFilter = document.getElementById('classFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            filteredRegistrations = allRegistrations.filter(registration => {
+                const matchesSearch = !searchTerm || 
+                    registration.studentName.toLowerCase().includes(searchTerm) ||
+                    registration.phone.includes(searchTerm) ||
+                    registration.idCard.includes(searchTerm);
+                
+                const matchesProject = !projectFilter || registration.projectId.toString() === projectFilter;
+                const matchesClass = !classFilter || registration.classId.toString() === classFilter;
+                const matchesStatus = !statusFilter || registration.status === statusFilter;
+                
+                return matchesSearch && matchesProject && matchesClass && matchesStatus;
+            });
+            
+            totalItems = filteredRegistrations.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示新增报名模态框
+        function showAddRegistrationModal() {
+            console.log('显示新增报名模态框');
+            editingRegistrationId = null;
+            document.getElementById('registrationModalTitle').textContent = '新增报名';
+            document.getElementById('registrationForm').reset();
+            document.getElementById('discountType').value = '';
+            document.getElementById('discountAmount').value = '';
+            document.getElementById('firstPaymentDue').value = '';
+            document.getElementById('firstPaymentReceived').value = '';
+            document.getElementById('tailPaymentDue').value = '';
+            document.getElementById('firstPaymentStatus').value = 'pending';
+            document.getElementById('actualFee').value = '';
+            // 重置班型选择
+            const classSelect = document.getElementById('classId');
+            classSelect.innerHTML = '<option value="">请先选择项目</option>';
+            document.getElementById('registrationModal').style.display = 'block';
+            console.log('新增报名模态框已显示');
+            updatePaymentFields();
+        }
+
+        // 关闭报名模态框
+        function closeRegistrationModal() {
+            console.log('关闭报名模态框');
+            const modal = document.getElementById('registrationModal');
+            if (modal) {
+                modal.style.display = 'none';
+                editingRegistrationId = null;
+                console.log('报名模态框已关闭');
+            } else {
+                console.error('无法找到模态框元素');
+            }
+        }
+
+        // 编辑报名
+        function editRegistration(registrationId) {
+            console.log('编辑报名 ID:', registrationId);
+            
+            // 检查必要的DOM元素是否存在
+            const modal = document.getElementById('registrationModal');
+            if (!modal) {
+                console.error('模态框元素不存在');
+                alert('页面元素加载不完整，请刷新页面重试');
+                return;
+            }
+            
+            const registration = allRegistrations.find(r => r.id === registrationId);
+            if (!registration) {
+                console.error('未找到报名记录:', registrationId);
+                alert('未找到报名记录');
+                return;
+            }
+
+            console.log('找到报名记录:', registration);
+            
+            // 验证所有需要的表单元素是否存在
+            const requiredElements = [
+                'registrationModalTitle', 'studentName', 'phone', 'idCard', 'email', 
+                'projectId', 'classId', 'education', 'workplace', 'address', 'remarks',
+                'totalFee', 'discountAmount', 'firstPaymentDue', 'firstPaymentReceived',
+                'tailPaymentDue', 'status', 'firstPaymentStatus', 'discountType', 'actualFee'
+            ];
+            
+            for (const elementId of requiredElements) {
+                if (!document.getElementById(elementId)) {
+                    console.error('缺少必要元素:', elementId);
+                    alert(`页面元素缺失: ${elementId}，请刷新页面重试`);
+                    return;
+                }
+            }
+            
+            editingRegistrationId = registrationId;
+            document.getElementById('registrationModalTitle').textContent = '编辑报名';
+            document.getElementById('studentName').value = registration.studentName || '';
+            document.getElementById('phone').value = registration.phone || '';
+            document.getElementById('idCard').value = registration.idCard || '';
+            document.getElementById('email').value = registration.email || '';
+            document.getElementById('projectId').value = registration.projectId || '';
+            
+            // 等待DOM更新后再加载班型
+            setTimeout(() => {
+                try {
+                    loadProjectClasses();
+                    // 再等待一下确保班型选项加载完成
+                    setTimeout(() => {
+                        try {
+                            document.getElementById('classId').value = registration.classId || '';
+                            document.getElementById('education').value = registration.education || '';
+                            document.getElementById('workplace').value = registration.workplace || '';
+                            document.getElementById('address').value = registration.address || '';
+                            document.getElementById('remarks').value = registration.remarks || '';
+                            document.getElementById('totalFee').value = registration.totalFee || '';
+                            document.getElementById('discountType').value = registration.discountType || '';
+                            document.getElementById('discountAmount').value = registration.discountAmount ?? '';
+                            document.getElementById('firstPaymentDue').value = registration.firstPaymentDue != null ? formatAmount(registration.firstPaymentDue) : '';
+                            document.getElementById('firstPaymentReceived').value = registration.firstPaymentReceived != null ? formatAmount(registration.firstPaymentReceived) : '';
+                            document.getElementById('tailPaymentDue').value = registration.tailPaymentDue != null ? formatAmount(registration.tailPaymentDue) : '';
+                            document.getElementById('actualFee').value = registration.actualFee || '';
+                            document.getElementById('status').value = registration.status || 'pending';
+                            document.getElementById('firstPaymentStatus').value = registration.firstPaymentStatus || 'pending';
+                            updatePaymentFields();
+                        } catch (error) {
+                            console.error('填充表单数据时发生错误:', error);
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('加载班型数据时发生错误:', error);
+                }
+            }, 10);
+            
+            console.log('显示模态框');
+            modal.style.display = 'block';
+            
+            // 确保模态框确实显示了
+            setTimeout(() => {
+                if (modal.style.display !== 'block') {
+                    console.error('模态框未能正常显示');
+                    modal.style.display = 'block';
+                }
+            }, 50);
+        }
+
+        // 保存报名
+        function saveRegistration() {
+            const totalFeeValue = parseFloat(document.getElementById('totalFee').value);
+            const discountAmountValue = parseFloat(document.getElementById('discountAmount').value) || 0;
+            const firstPaymentDueValue = parseFloat(document.getElementById('firstPaymentDue').value) || 0;
+            const firstPaymentReceivedValue = parseFloat(document.getElementById('firstPaymentReceived').value) || 0;
+            const tailPaymentDueValue = parseFloat(document.getElementById('tailPaymentDue').value) || 0;
+            const actualFeeValue = parseFloat(document.getElementById('actualFee').value) || Math.max(totalFeeValue - discountAmountValue, 0);
+            const discountTypeValue = document.getElementById('discountType').value;
+
+            const formData = {
+                studentName: document.getElementById('studentName').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                idCard: document.getElementById('idCard').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                projectId: parseInt(document.getElementById('projectId').value),
+                classId: parseInt(document.getElementById('classId').value),
+                education: document.getElementById('education').value,
+                workplace: document.getElementById('workplace').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                remarks: document.getElementById('remarks').value.trim(),
+                totalFee: totalFeeValue,
+                discountType: discountTypeValue,
+                discountAmount: discountAmountValue,
+                actualFee: actualFeeValue,
+                firstPaymentDue: firstPaymentDueValue,
+                firstPaymentReceived: firstPaymentReceivedValue,
+                tailPaymentDue: tailPaymentDueValue,
+                status: document.getElementById('status').value,
+                firstPaymentStatus: document.getElementById('firstPaymentStatus').value
+            };
+
+            // 表单验证
+            if (!formData.studentName) {
+                alert('请输入学员姓名');
+                return;
+            }
+            if (!formData.phone || !/^1[3-9]\d{9}$/.test(formData.phone)) {
+                alert('请输入正确的手机号');
+                return;
+            }
+            if (!formData.idCard) {
+                alert('请输入身份证号');
+                return;
+            }
+            if (!formData.projectId) {
+                alert('请选择报名项目');
+                return;
+            }
+            if (!formData.classId) {
+                alert('请选择班型');
+                return;
+            }
+            if (formData.totalFee && formData.discountAmount > formData.totalFee) {
+                alert('优惠金额不能大于应缴费用');
+                return;
+            }
+
+            const netAmount = Math.max((formData.totalFee || 0) - formData.discountAmount, 0);
+            if (formData.firstPaymentDue > netAmount) {
+                alert('首款应缴不能超过优惠后应缴金额');
+                return;
+            }
+            if (formData.firstPaymentReceived > formData.firstPaymentDue) {
+                alert('首款已收不能超过首款应缴');
+                return;
+            }
+
+            formData.actualFee = netAmount;
+            formData.tailPaymentDue = parseFloat(Math.max(netAmount - formData.firstPaymentReceived, 0).toFixed(2));
+            formData.discountTypeLabel = formData.discountType ? DISCOUNT_TYPE_LABELS[formData.discountType] : '';
+            if (formData.firstPaymentDue > 0 && formData.firstPaymentReceived >= formData.firstPaymentDue) {
+                formData.firstPaymentStatus = 'paid';
+            } else if (!formData.firstPaymentStatus) {
+                formData.firstPaymentStatus = 'pending';
+            }
+
+            // 检查重复身份证号
+            const existing = allRegistrations.find(r => r.idCard === formData.idCard && r.id !== editingRegistrationId);
+            if (existing) {
+                alert('该身份证号已存在报名记录');
+                return;
+            }
+
+            // 获取项目和班型信息
+            const project = allProjects.find(p => p.id === formData.projectId);
+            const classItem = allClasses.find(c => c.id === formData.classId);
+
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            if (editingRegistrationId) {
+                // 编辑模式
+                const registrationIndex = allRegistrations.findIndex(r => r.id === editingRegistrationId);
+                allRegistrations[registrationIndex] = {
+                    ...allRegistrations[registrationIndex],
+                    ...formData,
+                    projectName: project.name,
+                    className: classItem.name
+                };
+                showNotification('报名信息更新成功', 'success');
+            } else {
+                // 新增模式
+                const newRegistration = {
+                    id: Math.max(...allRegistrations.map(r => r.id), 0) + 1,
+                    ...formData,
+                    projectName: project.name,
+                    className: classItem.name,
+                    registrationTime: now,
+                    approver: '',
+                    approveTime: ''
+                };
+                allRegistrations.unshift(newRegistration);
+                showNotification('报名创建成功', 'success');
+            }
+
+            closeRegistrationModal();
+            applyFilters();
+            updateStatistics();
+        }
+
+        // 查看详情
+        function viewDetail(registrationId) {
+            const registration = allRegistrations.find(r => r.id === registrationId);
+            if (!registration) return;
+
+            const statusInfo = getStatusInfo(registration.status);
+            const paymentInfo = getPaymentStatusInfo(registration.firstPaymentStatus);
+            const discountLabel = registration.discountType ? (registration.discountTypeLabel || DISCOUNT_TYPE_LABELS[registration.discountType]) : '无';
+
+            document.getElementById('detailContent').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4>基本信息</h4>
+                        <table style="width: 100%; font-size: 14px;">
+                            <tr><td style="padding: 5px 0; font-weight: bold;">姓名：</td><td>${registration.studentName}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">手机号：</td><td>${registration.phone}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">身份证：</td><td>${registration.idCard}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">邮箱：</td><td>${registration.email || '未填写'}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">学历：</td><td>${registration.education || '未填写'}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">工作单位：</td><td>${registration.workplace || '未填写'}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">通讯地址：</td><td>${registration.address || '未填写'}</td></tr>
+                        </table>
+                    </div>
+                    <div>
+                        <h4>报名信息</h4>
+                        <table style="width: 100%; font-size: 14px;">
+                            <tr><td style="padding: 5px 0; font-weight: bold;">报名项目：</td><td>${registration.projectName}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">选择班型：</td><td>${registration.className}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">应缴费用：</td><td>¥${formatAmount(registration.totalFee)}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">所享优惠：</td><td>${discountLabel}${registration.discountAmount ? `（减免 ¥${formatAmount(registration.discountAmount)}）` : ''}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">首款应缴：</td><td>¥${formatAmount(registration.firstPaymentDue)}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">首款已收：</td><td>¥${formatAmount(registration.firstPaymentReceived)}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">尾款待缴：</td><td>¥${formatAmount(registration.tailPaymentDue)}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">优惠后应缴：</td><td style="color: #e74c3c; font-weight: bold;">¥${formatAmount(registration.actualFee)}</td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">审核状态：</td><td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">首款状态：</td><td><span class="status-badge ${paymentInfo.class}">${paymentInfo.text}</span></td></tr>
+                            <tr><td style="padding: 5px 0; font-weight: bold;">报名时间：</td><td>${registration.registrationTime}</td></tr>
+                            ${registration.approveTime ? `<tr><td style="padding: 5px 0; font-weight: bold;">审核时间：</td><td>${registration.approveTime}</td></tr>` : ''}
+                        </table>
+                    </div>
+                </div>
+                ${registration.remarks ? `
+                    <div style="margin-top: 20px;">
+                        <h4>备注信息</h4>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 14px;">
+                            ${registration.remarks}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        // 关闭详情模态框
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        // 审核通过
+        function approveRegistration(registrationId) {
+            const registration = allRegistrations.find(r => r.id === registrationId);
+            if (!registration) return;
+
+            if (confirm(`确定要通过 ${registration.studentName} 的报名申请吗？`)) {
+                registration.status = 'approved';
+                registration.approver = '管理员';
+                registration.approveTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                showNotification('报名审核通过', 'success');
+                renderTable();
+                updateStatistics();
+            }
+        }
+
+        // 审核拒绝
+        function rejectRegistration(registrationId) {
+            const registration = allRegistrations.find(r => r.id === registrationId);
+            if (!registration) return;
+
+            const reason = prompt('请输入拒绝原因：');
+            if (reason !== null) {
+                registration.status = 'rejected';
+                registration.approver = '管理员';
+                registration.approveTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                registration.remarks = (registration.remarks ? registration.remarks + '\n' : '') + `拒绝原因：${reason}`;
+                showNotification('报名已拒绝', 'warning');
+                renderTable();
+                updateStatistics();
+            }
+        }
+
+        // 删除报名
+        function deleteRegistration(registrationId) {
+            const registration = allRegistrations.find(r => r.id === registrationId);
+            if (!registration) return;
+
+            if (confirm(`确定要删除 ${registration.studentName} 的报名记录吗？`)) {
+                allRegistrations = allRegistrations.filter(r => r.id !== registrationId);
+                showNotification('报名记录删除成功', 'success');
+                applyFilters();
+                updateStatistics();
+            }
+        }
+
+        // 批量选择
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.registration-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateBatchApproveButton();
+        }
+
+        // 更新批量审核按钮
+        function updateBatchApproveButton() {
+            const checked = document.querySelectorAll('.registration-checkbox:checked').length;
+            const batchBtn = document.getElementById('batchApproveBtn');
+            batchBtn.disabled = checked === 0;
+            batchBtn.innerHTML = checked > 0 ? `<i class="fas fa-check"></i> 批量审核 (${checked})` : '<i class="fas fa-check"></i> 批量审核';
+        }
+
+        // 监听复选框变化
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('registration-checkbox')) {
+                updateBatchApproveButton();
+            }
+        });
+
+        // 批量审核
+        function batchApprove() {
+            const checkboxes = document.querySelectorAll('.registration-checkbox:checked');
+            if (checkboxes.length === 0) return;
+
+            if (confirm(`确定要批量审核通过选中的 ${checkboxes.length} 个报名申请吗？`)) {
+                const idsToApprove = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                
+                allRegistrations.forEach(registration => {
+                    if (idsToApprove.includes(registration.id) && registration.status === 'pending') {
+                        registration.status = 'approved';
+                        registration.approver = '管理员';
+                        registration.approveTime = now;
+                    }
+                });
+                
+                showNotification(`成功审核通过 ${checkboxes.length} 个报名申请`, 'success');
+                renderTable();
+                updateStatistics();
+                document.getElementById('selectAll').checked = false;
+            }
+        }
+
+        // 导出报名数据
+        function exportRegistrations() {
+            const csvContent = generateCSV(filteredRegistrations);
+            downloadCSV(csvContent, 'registrations.csv');
+            showNotification('报名数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['报名ID', '学员姓名', '手机号', '身份证号', '邮箱', '报名项目', '选择班型', '学历', '工作单位', '应缴费用', '所享优惠', '优惠金额', '首款应缴', '首款已收', '尾款待缴', '首款状态', '审核状态', '报名时间'];
+            const rows = data.map(registration => {
+                const statusInfo = getStatusInfo(registration.status);
+                const paymentInfo = getPaymentStatusInfo(registration.firstPaymentStatus);
+                const discountLabel = registration.discountType ? (registration.discountTypeLabel || DISCOUNT_TYPE_LABELS[registration.discountType]) : '';
+                return [
+                    registration.id,
+                    registration.studentName,
+                    registration.phone,
+                    registration.idCard,
+                    registration.email || '',
+                    registration.projectName,
+                    registration.className,
+                    registration.education || '',
+                    registration.workplace || '',
+                    formatAmount(registration.totalFee),
+                    discountLabel,
+                    formatAmount(registration.discountAmount),
+                    formatAmount(registration.firstPaymentDue),
+                    formatAmount(registration.firstPaymentReceived),
+                    formatAmount(registration.tailPaymentDue),
+                    paymentInfo.text,
+                    statusInfo.text,
+                    registration.registrationTime
+                ];
+            });
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // 导入相关功能
+        function showImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importBtn').disabled = true;
+        }
+
+        function selectImportFile() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('importSummary').innerHTML = `
+                <p>文件名：${file.name}</p>
+                <p>文件大小：${(file.size / 1024).toFixed(2)} KB</p>
+                <p>准备导入报名数据...</p>
+            `;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importBtn').disabled = false;
+        }
+
+        function importRegistrations() {
+            showNotification('正在导入报名数据...', 'info');
+            setTimeout(() => {
+                showNotification('报名数据导入成功', 'success');
+                closeImportModal();
+                loadRegistrations();
+            }, 2000);
+        }
+
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

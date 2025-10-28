@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link active">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">仪表盘</h1>
+                    <p class="page-subtitle">系统概览和快捷操作</p>
+                </div>
+                <!-- 用户信息区域 -->
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 筛选条件 -->
+            <div class="data-table">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <h3>数据筛选</h3>
+                    </div>
+                    <div class="toolbar-right">
+                        <select id="timeFilter" class="form-select" onchange="onTimeFilterChange()">
+                            <option value="all">全部时间</option>
+                            <option value="today">今天</option>
+                            <option value="week">最近7天</option>
+                            <option value="month">最近30天</option>
+                            <option value="quarter">最近3个月</option>
+                            <option value="custom">自定义日期</option>
+                        </select>
+                        <div id="customDateRange" style="display: none; margin-left: 10px;">
+                            <input type="date" id="startDate" class="form-control" style="display: inline-block; width: 140px; margin-right: 5px;" onchange="applyFilters()">
+                            <span style="margin: 0 5px;">至</span>
+                            <input type="date" id="endDate" class="form-control" style="display: inline-block; width: 140px;" onchange="applyFilters()">
+                        </div>
+                        <select id="projectFilter" class="form-select" onchange="applyFilters()" style="margin-left: 10px;">
+                            <option value="all">全部项目</option>
+                            <option value="project1">2024年省考项目</option>
+                            <option value="project2">2024年选调生项目</option>
+                            <option value="project3">2024年事业单位项目</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <div class="stats-update-time" id="totalUsersTime">刚刚</div>
+                    <div class="stats-number" id="totalUsers">0</div>
+                    <div class="stats-label">总用户数</div>
+                    <div class="stats-change stats-up">
+                        <i class="fas fa-arrow-up"></i> +12%
+                    </div>
+                </div>
+                <div class="stats-card success">
+                    <div class="stats-update-time" id="activeRegistrationsTime">刚刚</div>
+                    <div class="stats-number" id="activeRegistrations">0</div>
+                    <div class="stats-label">有效报名</div>
+                    <div class="stats-change stats-up">
+                        <i class="fas fa-arrow-up"></i> +8%
+                    </div>
+                </div>
+                <div class="stats-card danger">
+                    <div class="stats-update-time" id="blacklistCountTime">刚刚</div>
+                    <div class="stats-number" id="blacklistCount">0</div>
+                    <div class="stats-label">黑名单用户</div>
+                    <div class="stats-change stats-up">
+                        <i class="fas fa-arrow-up"></i> +3
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="data-table">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <h3>快捷操作</h3>
+                    </div>
+                </div>
+                <div style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; border-left: 4px solid #007aff;">
+                        <h4 style="margin-bottom: 10px; color: #333;">用户管理</h4>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">查看和管理系统用户信息</p>
+                        <a href="users.html" class="btn btn-primary btn-sm">进入管理</a>
+                    </div>
+                    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; border-left: 4px solid #52c41a;">
+                        <h4 style="margin-bottom: 10px; color: #333;">报名管理</h4>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">查看和处理用户报名信息</p>
+                        <a href="registrations-projects.html" class="btn btn-success btn-sm">进入管理</a>
+                    </div>
+                    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; border-left: 4px solid #f39c12;">
+                        <h4 style="margin-bottom: 10px; color: #333;">项目管理</h4>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">创建和管理报名项目</p>
+                        <a href="projects.html" class="btn btn-warning btn-sm">进入管理</a>
+                    </div>
+                    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; border-left: 4px solid #e74c3c;">
+                        <h4 style="margin-bottom: 10px; color: #333;">黑名单管理</h4>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">维护用户黑名单</p>
+                        <a href="blacklist.html" class="btn btn-danger btn-sm">进入管理</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近报名记录 -->
+            <div class="data-table">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <h3>最近报名记录</h3>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn btn-secondary btn-sm" onclick="refreshRegistrations()">
+                            <i class="fas fa-sync"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>所属项目</th>
+                            <th>班型</th>
+                            <th>用户手机号</th>
+                            <th>用户姓名</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registrationTable">
+                        <tr>
+                            <td>2024-01-15 14:30</td>
+                            <td>2024年省考项目</td>
+                            <td>笔试班</td>
+                            <td>138****5678</td>
+                            <td>张三</td>
+                            <td><span class="status-badge status-active">报名成功</span></td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15 14:25</td>
+                            <td>2024年选调生项目</td>
+                            <td>面试班</td>
+                            <td>139****1234</td>
+                            <td>李四</td>
+                            <td><span class="status-badge status-active">报名成功</span></td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15 14:20</td>
+                            <td>2024年事业单位项目</td>
+                            <td>全程班</td>
+                            <td>137****9876</td>
+                            <td>王五</td>
+                            <td><span class="status-badge status-inactive">报名失败</span></td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15 14:15</td>
+                            <td>2024年省考项目</td>
+                            <td>笔试班</td>
+                            <td>136****5432</td>
+                            <td>赵六</td>
+                            <td><span class="status-badge status-active">报名成功</span></td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15 14:10</td>
+                            <td>2024年选调生项目</td>
+                            <td>全程班</td>
+                            <td>135****8765</td>
+                            <td>钱七</td>
+                            <td><span class="status-badge status-active">报名成功</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 页面加载时初始化数据
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateInputs();
+            loadDashboardData();
+            loadRegistrationData();
+        });
+        
+        // 初始化日期输入框
+        function initializeDateInputs() {
+            const today = new Date();
+            const endDate = today.toISOString().split('T')[0];
+            const startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            document.getElementById('endDate').value = endDate;
+            document.getElementById('startDate').value = startDate;
+        }
+        
+        // 时间筛选器变化处理
+        function onTimeFilterChange() {
+            const timeFilter = document.getElementById('timeFilter').value;
+            const customDateRange = document.getElementById('customDateRange');
+            
+            if (timeFilter === 'custom') {
+                customDateRange.style.display = 'inline-block';
+            } else {
+                customDateRange.style.display = 'none';
+            }
+            
+            applyFilters();
+        }
+
+        // 获取时间筛选范围
+        function getTimeRange() {
+            const timeFilter = document.getElementById('timeFilter').value;
+            const today = new Date();
+            let startDate, endDate;
+            
+            switch (timeFilter) {
+                case 'today':
+                    startDate = new Date(today);
+                    endDate = new Date(today);
+                    break;
+                case 'week':
+                    startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    endDate = new Date(today);
+                    break;
+                case 'month':
+                    startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    endDate = new Date(today);
+                    break;
+                case 'quarter':
+                    startDate = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+                    endDate = new Date(today);
+                    break;
+                case 'custom':
+                    const startInput = document.getElementById('startDate').value;
+                    const endInput = document.getElementById('endDate').value;
+                    if (startInput && endInput) {
+                        startDate = new Date(startInput);
+                        endDate = new Date(endInput);
+                    } else {
+                        // 如果自定义日期未设置，默认使用最近30天
+                        startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        endDate = new Date(today);
+                    }
+                    break;
+                default: // 'all'
+                    startDate = new Date('2024-01-01');
+                    endDate = new Date(today);
+            }
+            
+            return { startDate, endDate };
+        }
+        
+        // 加载仪表盘数据
+        function loadDashboardData() {
+            // 更新数据更新时间
+            updateDataTime();
+            
+            // 根据筛选条件加载数据
+            const timeFilter = document.getElementById('timeFilter').value;
+            const projectFilter = document.getElementById('projectFilter').value;
+            const { startDate, endDate } = getTimeRange();
+            
+            // 根据时间范围计算天数差
+            const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            
+            // 模拟数据加载，根据筛选条件调整数据
+            let totalUsers, activeRegistrations, blacklistCount;
+            
+            // 根据时间范围调整数据（模拟真实场景下的数据分布）
+            const baseMultiplier = Math.min(daysDiff / 30, 3); // 最多3倍数据
+            
+            if (timeFilter === 'today') {
+                totalUsers = 23;
+                activeRegistrations = 15;
+                blacklistCount = 1;
+            } else if (timeFilter === 'week') {
+                totalUsers = 156;
+                activeRegistrations = 98;
+                blacklistCount = 3;
+            } else if (timeFilter === 'month') {
+                totalUsers = 567;
+                activeRegistrations = 324;
+                blacklistCount = 12;
+            } else if (timeFilter === 'quarter') {
+                totalUsers = 1234;
+                activeRegistrations = 856;
+                blacklistCount = 34;
+            } else if (timeFilter === 'custom') {
+                // 自定义时间范围的数据计算
+                const dailyAverage = { users: 12, registrations: 8, blacklist: 0.4 };
+                totalUsers = Math.floor(dailyAverage.users * daysDiff);
+                activeRegistrations = Math.floor(dailyAverage.registrations * daysDiff);
+                blacklistCount = Math.floor(dailyAverage.blacklist * daysDiff);
+            } else {
+                totalUsers = 2468;
+                activeRegistrations = 1578;
+                blacklistCount = 45;
+            }
+            
+            // 根据项目筛选调整数据
+            if (projectFilter !== 'all') {
+                totalUsers = Math.floor(totalUsers * 0.6);
+                activeRegistrations = Math.floor(activeRegistrations * 0.7);
+                blacklistCount = Math.floor(blacklistCount * 0.5);
+            }
+            
+            animateCounter('totalUsers', totalUsers);
+            animateCounter('activeRegistrations', activeRegistrations);
+            animateCounter('blacklistCount', blacklistCount);
+        }
+
+        // 更新数据更新时间
+        function updateDataTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            
+            document.getElementById('totalUsersTime').textContent = timeStr;
+            document.getElementById('activeRegistrationsTime').textContent = timeStr;
+            document.getElementById('blacklistCountTime').textContent = timeStr;
+        }
+
+        // 数字动画效果
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 1000;
+            const increment = targetValue / (duration / 16);
+            let currentValue = 0;
+
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue).toLocaleString();
+            }, 16);
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            showNotification('正在更新数据...', 'info');
+            
+            // 更新统计数据
+            setTimeout(() => {
+                loadDashboardData();
+                loadRegistrationData();
+                showNotification('数据更新完成', 'success');
+            }, 500);
+        }
+        
+        // 加载报名记录数据
+        function loadRegistrationData() {
+            const timeFilter = document.getElementById('timeFilter').value;
+            const projectFilter = document.getElementById('projectFilter').value;
+            const tableBody = document.getElementById('registrationTable');
+            const { startDate, endDate } = getTimeRange();
+            
+            // 模拟数据生成（根据时间范围生成相应的数据）
+            let allRegistrations = [
+                {
+                    time: '2024-01-15 14:30',
+                    project: '2024年省考项目',
+                    classType: '笔试班',
+                    phone: '138****5678',
+                    name: '张三',
+                    status: '报名成功',
+                    date: new Date('2024-01-15')
+                },
+                {
+                    time: '2024-01-14 14:25',
+                    project: '2024年选调生项目',
+                    classType: '面试班',
+                    phone: '139****1234',
+                    name: '李四',
+                    status: '报名成功',
+                    date: new Date('2024-01-14')
+                },
+                {
+                    time: '2024-01-13 14:20',
+                    project: '2024年事业单位项目',
+                    classType: '全程班',
+                    phone: '137****9876',
+                    name: '王五',
+                    status: '报名失败',
+                    date: new Date('2024-01-13')
+                },
+                {
+                    time: '2024-01-12 14:15',
+                    project: '2024年省考项目',
+                    classType: '笔试班',
+                    phone: '136****5432',
+                    name: '赵六',
+                    status: '报名成功',
+                    date: new Date('2024-01-12')
+                },
+                {
+                    time: '2024-01-11 14:10',
+                    project: '2024年选调生项目',
+                    classType: '全程班',
+                    phone: '135****8765',
+                    name: '钱七',
+                    status: '报名成功',
+                    date: new Date('2024-01-11')
+                },
+                {
+                    time: '2024-01-10 09:30',
+                    project: '2024年省考项目',
+                    classType: '面试班',
+                    phone: '134****2345',
+                    name: '孙八',
+                    status: '报名成功',
+                    date: new Date('2024-01-10')
+                },
+                {
+                    time: '2024-01-09 16:45',
+                    project: '2024年事业单位项目',
+                    classType: '笔试班',
+                    phone: '133****6789',
+                    name: '周九',
+                    status: '报名失败',
+                    date: new Date('2024-01-09')
+                }
+            ];
+            
+            // 根据时间范围过滤数据
+            let registrations = allRegistrations.filter(reg => {
+                return reg.date >= startDate && reg.date <= endDate;
+            });
+            
+            // 根据项目筛选过滤数据
+            if (projectFilter !== 'all') {
+                const projectMap = {
+                    'project1': '2024年省考项目',
+                    'project2': '2024年选调生项目',
+                    'project3': '2024年事业单位项目'
+                };
+                const selectedProject = projectMap[projectFilter];
+                registrations = registrations.filter(reg => reg.project === selectedProject);
+            }
+            
+            // 按时间倒序排序
+            registrations.sort((a, b) => b.date - a.date);
+            
+            // 渲染表格
+            tableBody.innerHTML = '';
+            if (registrations.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #999; padding: 40px;">
+                            所选时间范围内暂无报名记录
+                        </td>
+                    </tr>
+                `;
+            } else {
+                registrations.forEach(reg => {
+                    const statusClass = reg.status === '报名成功' ? 'status-active' : 'status-inactive';
+                    const row = `
+                        <tr>
+                            <td>${reg.time}</td>
+                            <td>${reg.project}</td>
+                            <td>${reg.classType}</td>
+                            <td>${reg.phone}</td>
+                            <td>${reg.name}</td>
+                            <td><span class="status-badge ${statusClass}">${reg.status}</span></td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }
+        }
+        
+        // 刷新报名记录
+        function refreshRegistrations() {
+            const button = event.target.closest('button');
+            const icon = button.querySelector('i');
+            
+            // 添加旋转动画
+            icon.style.animation = 'spin 1s linear';
+            
+            // 模拟数据刷新
+            setTimeout(() => {
+                icon.style.animation = '';
+                loadRegistrationData();
+                showNotification('报名记录已刷新', 'success');
+            }, 1000);
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

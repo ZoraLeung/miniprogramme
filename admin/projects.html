@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link active">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">项目管理</h1>
+                    <p class="page-subtitle">管理选调生、省考、申论等培训项目</p>
+                </div>
+                <!-- 用户信息区域 -->
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <div class="stats-update-time" id="totalProjectsTime">刚刚</div>
+                    <div class="stats-number" id="totalProjects">0</div>
+                    <div class="stats-label">总项目数</div>
+                    <div class="stats-description">系统中创建的所有培训项目数量</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="publishedProjectsTime">刚刚</div>
+                    <div class="stats-number" id="publishedProjects">0</div>
+                    <div class="stats-label">已上架</div>
+                    <div class="stats-description">当前开放报名的项目数量</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="draftProjectsTime">刚刚</div>
+                    <div class="stats-number" id="draftProjects">0</div>
+                    <div class="stats-label">草稿</div>
+                    <div class="stats-description">未发布的草稿项目数量</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="expiredProjectsTime">刚刚</div>
+                    <div class="stats-number" id="expiredProjects">0</div>
+                    <div class="stats-label">已过期</div>
+                    <div class="stats-description">报名截止日期已过的项目数量</div>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-primary" onclick="showAddProjectModal()">
+                        <i class="fas fa-plus"></i> 新建项目
+                    </button>
+                    <button class="btn btn-success" onclick="exportProjects()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn btn-warning" onclick="showImportModal()">
+                        <i class="fas fa-upload"></i> 导入数据
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <select class="form-select" style="width: 120px;" onchange="filterProjects()" id="typeFilter">
+                        <option value="">全部类型</option>
+                        <option value="选调生">选调生</option>
+                        <option value="省考">省考</option>
+                        <option value="申论">申论</option>
+                        <option value="国考">国考</option>
+                    </select>
+                    <select class="form-select" style="width: 120px;" onchange="filterProjects()" id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="published">已上架</option>
+                        <option value="draft">草稿</option>
+                        <option value="expired">已过期</option>
+                    </select>
+                    <input type="text" class="search-box" placeholder="搜索项目名称" id="searchInput">
+                    <button class="btn btn-secondary" onclick="searchProjects()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>项目ID</th>
+                                <th>项目名称</th>
+                                <th>开始时间</th>
+                                <th>结束时间</th>
+                                <th>报名人数</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑项目模态框 -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="projectModalTitle">新建项目</h3>
+                <button class="modal-close" onclick="closeProjectModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <div class="form-group">
+                        <label class="form-label">项目名称 <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="projectName" required placeholder="请输入项目名称" readonly>
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">项目名称一旦创建无法修改</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">开始时间 <span class="form-required">*</span></label>
+                            <input type="datetime-local" class="form-control" id="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">结束时间 <span class="form-required">*</span></label>
+                            <input type="datetime-local" class="form-control" id="endTime" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">项目描述</label>
+                        <textarea class="form-control form-textarea" id="projectDescription" 
+                                  placeholder="请输入项目简介和说明"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">计划人数</label>
+                            <input type="number" class="form-control" id="maxRegistrations" 
+                                   placeholder="计划招生人数，0表示无限制" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">项目状态</label>
+                            <select class="form-select" id="projectStatus">
+                                <option value="draft">草稿</option>
+                                <option value="published">已上架</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeProjectModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveProject()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入数据模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">导入项目数据</h3>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload" onclick="selectImportFile()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                    <div class="file-upload-text">点击选择Excel文件或拖拽到此处</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        支持.xlsx/.xls格式，文件大小不超过10MB
+                    </div>
+                </div>
+                <input type="file" id="importFile" accept=".xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                
+                <div id="importPreview" style="display: none; margin-top: 20px;">
+                    <h4>导入预览</h4>
+                    <div id="importSummary"></div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>导入说明：</h5>
+                    <ul style="margin: 10px 0; padding-left: 20px; font-size: 14px; color: #666;">
+                        <li>Excel第一行应为列标题：项目名称、项目类型、开始时间、结束时间、项目描述、状态</li>
+                        <li>项目名称和项目类型为必填项</li>
+                        <li>时间格式：YYYY-MM-DD HH:mm:ss</li>
+                        <li>状态可选值：draft(草稿)、published(已上架)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" id="importBtn" onclick="importProjects()" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let allProjects = [];
+        let filteredProjects = [];
+        let editingProjectId = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjects();
+        });
+
+        // 模拟项目数据
+        function generateMockProjects() {
+            const projectTypes = ['选调生', '省考', '申论', '国考', '事业单位'];
+            const statuses = ['published', 'draft', 'expired'];
+            const mockData = [];
+            
+            for (let i = 1; i <= 25; i++) {
+                const startTime = new Date(Date.now() + Math.random() * 60 * 24 * 60 * 60 * 1000); // 未来60天内
+                const endTime = new Date(startTime.getTime() + (Math.random() * 30 + 10) * 24 * 60 * 60 * 1000); // 开始后10-40天
+                const createTime = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // 过去30天内
+                const projectType = projectTypes[Math.floor(Math.random() * projectTypes.length)];
+                
+                // 根据时间自动判断状态
+                let status;
+                if (endTime < new Date()) {
+                    status = 'expired';
+                } else {
+                    status = Math.random() > 0.3 ? 'published' : 'draft';
+                }
+                
+                mockData.push({
+                    id: i,
+                    name: `${projectType}培训班第${i}期`,
+                    type: projectType,
+                    startTime: startTime.toISOString().slice(0, 19).replace('T', ' '),
+                    endTime: endTime.toISOString().slice(0, 19).replace('T', ' '),
+                    description: `${projectType}专业培训课程，包含理论学习和实战演练`,
+                    maxRegistrations: Math.random() > 0.5 ? Math.floor(Math.random() * 100) + 50 : 0,
+                    currentRegistrations: Math.floor(Math.random() * 80),
+                    status: status,
+                    tags: ['热门', '推荐'][Math.floor(Math.random() * 2)],
+                    sortOrder: Math.floor(Math.random() * 100),
+                    createTime: createTime.toISOString().slice(0, 19).replace('T', ' '),
+                    creator: '管理员'
+                });
+            }
+            return mockData.sort((a, b) => b.sortOrder - a.sortOrder);
+        }
+
+        // 加载项目数据
+        function loadProjects() {
+            allProjects = generateMockProjects();
+            filteredProjects = [...allProjects];
+            totalItems = filteredProjects.length;
+            renderTable();
+            updatePagination();
+            updateStatistics();
+        }
+
+        // 更新统计信息
+        function updateStatistics() {
+            const total = allProjects.length;
+            const published = allProjects.filter(p => p.status === 'published').length;
+            const draft = allProjects.filter(p => p.status === 'draft').length;
+            const expired = allProjects.filter(p => p.status === 'expired').length;
+            
+            animateCounter('totalProjects', total);
+            animateCounter('publishedProjects', published);
+            animateCounter('draftProjects', draft);
+            animateCounter('expiredProjects', expired);
+        }
+
+        // 数字动画
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 800;
+            const increment = targetValue / (duration / 16);
+            let currentValue = 0;
+
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue);
+            }, 16);
+        }
+
+        // 获取状态显示文本和样式
+        function getStatusInfo(status, endTime) {
+            const now = new Date();
+            const end = new Date(endTime);
+            
+            if (end < now) {
+                return { text: '已过期', class: 'status-inactive' };
+            }
+            
+            switch(status) {
+                case 'published':
+                    return { text: '已上架', class: 'status-active' };
+                case 'draft':
+                    return { text: '草稿', class: 'status-pending' };
+                default:
+                    return { text: status, class: 'status-pending' };
+            }
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('projectTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredProjects.slice(start, end);
+
+            tbody.innerHTML = pageData.map(project => {
+                const statusInfo = getStatusInfo(project.status, project.endTime);
+                const registrationText = project.maxRegistrations > 0 
+                    ? `${project.currentRegistrations}/${project.maxRegistrations}`
+                    : project.currentRegistrations.toString();
+                
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="project-checkbox" value="${project.id}"></td>
+                        <td>${project.id}</td>
+                        <td><strong>${project.name}</strong></td>
+                        <td>${project.startTime}</td>
+                        <td>${project.endTime}</td>
+                        <td>${registrationText}</td>
+                        <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                        <td>${project.createTime}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-primary" onclick="editProject(${project.id})" title="编辑">
+                                <i class="fas fa-edit"></i> 编辑
+                            </button>
+                            <button class="btn ${project.status === 'published' ? 'btn-warning' : 'btn-success'}" 
+                                    onclick="togglePublish(${project.id})" 
+                                    title="${project.status === 'published' ? '下架' : '上架'}">
+                                <i class="fas fa-${project.status === 'published' ? 'eye-slash' : 'eye'}"></i> ${project.status === 'published' ? '下架' : '上架'}
+                            </button>
+                            <button class="btn btn-secondary" onclick="duplicateProject(${project.id})" title="复制">
+                                <i class="fas fa-copy"></i> 复制
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteProject(${project.id})" title="删除">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalItems;
+        }
+
+        // 搜索项目
+        function searchProjects() {
+            applyFilters();
+        }
+
+        // 筛选项目
+        function filterProjects() {
+            applyFilters();
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            filteredProjects = allProjects.filter(project => {
+                const matchesSearch = !searchTerm || 
+                    project.name.toLowerCase().includes(searchTerm) ||
+                    project.description.toLowerCase().includes(searchTerm);
+                
+                const matchesType = !typeFilter || project.type === typeFilter;
+                
+                let actualStatus = project.status;
+                if (new Date(project.endTime) < new Date()) {
+                    actualStatus = 'expired';
+                }
+                const matchesStatus = !statusFilter || actualStatus === statusFilter;
+                
+                return matchesSearch && matchesType && matchesStatus;
+            });
+            
+            totalItems = filteredProjects.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示新建项目模态框
+        function showAddProjectModal() {
+            editingProjectId = null;
+            document.getElementById('projectModalTitle').textContent = '新建项目';
+            document.getElementById('projectForm').reset();
+            
+            // 新建项目时，项目名称可编辑
+            const projectNameInput = document.getElementById('projectName');
+            projectNameInput.readOnly = false;
+            projectNameInput.style.backgroundColor = '';
+            projectNameInput.placeholder = '请输入项目名称';
+            
+            // 设置默认时间
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('startTime').value = now.toISOString().slice(0, 16);
+            
+            const endTime = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30天后
+            document.getElementById('endTime').value = endTime.toISOString().slice(0, 16);
+            
+            document.getElementById('projectModal').style.display = 'block';
+        }
+
+        // 关闭项目模态框
+        function closeProjectModal() {
+            document.getElementById('projectModal').style.display = 'none';
+            editingProjectId = null;
+        }
+
+        // 编辑项目
+        function editProject(projectId) {
+            const project = allProjects.find(p => p.id === projectId);
+            if (!project) return;
+
+            editingProjectId = projectId;
+            document.getElementById('projectModalTitle').textContent = '编辑项目';
+            
+            // 编辑项目时，项目名称只读
+            const projectNameInput = document.getElementById('projectName');
+            projectNameInput.value = project.name;
+            projectNameInput.readOnly = true;
+            projectNameInput.style.backgroundColor = '#f5f5f5';
+            projectNameInput.placeholder = '';
+            
+            document.getElementById('startTime').value = project.startTime.replace(' ', 'T');
+            document.getElementById('endTime').value = project.endTime.replace(' ', 'T');
+            document.getElementById('projectDescription').value = project.description;
+            document.getElementById('maxRegistrations').value = project.maxRegistrations || '';
+            document.getElementById('projectStatus').value = project.status;
+            
+            document.getElementById('projectModal').style.display = 'block';
+        }
+
+        // 保存项目
+        function saveProject() {
+            const formData = {
+                name: document.getElementById('projectName').value.trim(),
+                startTime: document.getElementById('startTime').value.replace('T', ' '),
+                endTime: document.getElementById('endTime').value.replace('T', ' '),
+                description: document.getElementById('projectDescription').value.trim(),
+                maxRegistrations: parseInt(document.getElementById('maxRegistrations').value) || 0,
+                status: document.getElementById('projectStatus').value
+            };
+
+            // 表单验证
+            if (!formData.name) {
+                alert('请输入项目名称');
+                return;
+            }
+            if (!formData.startTime || !formData.endTime) {
+                alert('请设置项目开始和结束时间');
+                return;
+            }
+            if (new Date(formData.startTime) >= new Date(formData.endTime)) {
+                alert('结束时间必须晚于开始时间');
+                return;
+            }
+
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            if (editingProjectId) {
+                // 编辑模式
+                const projectIndex = allProjects.findIndex(p => p.id === editingProjectId);
+                allProjects[projectIndex] = {
+                    ...allProjects[projectIndex],
+                    startTime: formData.startTime,
+                    endTime: formData.endTime,
+                    description: formData.description,
+                    maxRegistrations: formData.maxRegistrations,
+                    status: formData.status
+                };
+                showNotification('项目更新成功', 'success');
+            } else {
+                // 新增模式 - 需要随机分配项目类型
+                const projectTypes = ['选调生', '省考', '申论', '国考', '事业单位'];
+                const newProject = {
+                    id: Math.max(...allProjects.map(p => p.id), 0) + 1,
+                    name: formData.name,
+                    type: projectTypes[Math.floor(Math.random() * projectTypes.length)], // 随机分配类型
+                    startTime: formData.startTime,
+                    endTime: formData.endTime,
+                    description: formData.description,
+                    maxRegistrations: formData.maxRegistrations,
+                    status: formData.status,
+                    currentRegistrations: 0,
+                    tags: '',
+                    sortOrder: 0,
+                    createTime: now,
+                    creator: '管理员'
+                };
+                allProjects.unshift(newProject);
+                showNotification('项目创建成功', 'success');
+            }
+
+            closeProjectModal();
+            applyFilters();
+            updateStatistics();
+        }
+
+        // 切换发布状态
+        function togglePublish(projectId) {
+            const project = allProjects.find(p => p.id === projectId);
+            if (!project) return;
+
+            // 检查是否已过期
+            if (new Date(project.endTime) < new Date()) {
+                alert('已过期的项目无法修改状态');
+                return;
+            }
+
+            const newStatus = project.status === 'published' ? 'draft' : 'published';
+            project.status = newStatus;
+            
+            const action = newStatus === 'published' ? '上架' : '下架';
+            showNotification(`项目${action}成功`, 'success');
+            
+            renderTable();
+            updateStatistics();
+        }
+
+        // 复制项目
+        function duplicateProject(projectId) {
+            const project = allProjects.find(p => p.id === projectId);
+            if (!project) return;
+
+            const now = new Date();
+            const startTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 明天
+            const endTime = new Date(startTime.getTime() + 30 * 24 * 60 * 60 * 1000); // 30天后
+
+            const newProject = {
+                ...project,
+                id: Math.max(...allProjects.map(p => p.id), 0) + 1,
+                name: project.name + ' (副本)',
+                startTime: startTime.toISOString().slice(0, 19).replace('T', ' '),
+                endTime: endTime.toISOString().slice(0, 19).replace('T', ' '),
+                status: 'draft',
+                currentRegistrations: 0,
+                createTime: now.toISOString().slice(0, 19).replace('T', ' ')
+            };
+
+            allProjects.unshift(newProject);
+            showNotification('项目复制成功', 'success');
+            applyFilters();
+            updateStatistics();
+        }
+
+        // 删除项目
+        function deleteProject(projectId) {
+            const project = allProjects.find(p => p.id === projectId);
+            if (!project) return;
+
+            if (project.currentRegistrations > 0) {
+                if (!confirm(`该项目已有 ${project.currentRegistrations} 人报名，确定要删除吗？`)) {
+                    return;
+                }
+            }
+
+            if (confirm(`确定要删除项目"${project.name}"吗？`)) {
+                allProjects = allProjects.filter(p => p.id !== projectId);
+                showNotification('项目删除成功', 'success');
+                applyFilters();
+                updateStatistics();
+            }
+        }
+
+        // 批量选择
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.project-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // 导出项目数据
+        function exportProjects() {
+            const csvContent = generateCSV(filteredProjects);
+            downloadCSV(csvContent, 'projects.csv');
+            showNotification('项目数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['项目ID', '项目名称', '开始时间', '结束时间', '报名人数', '计划人数', '状态', '创建时间'];
+            const rows = data.map(project => {
+                const statusInfo = getStatusInfo(project.status, project.endTime);
+                return [
+                    project.id,
+                    project.name,
+                    project.startTime,
+                    project.endTime,
+                    project.currentRegistrations,
+                    project.maxRegistrations || '无限制',
+                    statusInfo.text,
+                    project.createTime
+                ];
+            });
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // 导入相关功能
+        function showImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importBtn').disabled = true;
+        }
+
+        function selectImportFile() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('importSummary').innerHTML = `
+                <p>文件名：${file.name}</p>
+                <p>文件大小：${(file.size / 1024).toFixed(2)} KB</p>
+                <p>准备导入项目数据...</p>
+            `;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importBtn').disabled = false;
+        }
+
+        function importProjects() {
+            showNotification('正在导入项目数据...', 'info');
+            setTimeout(() => {
+                showNotification('项目数据导入成功', 'success');
+                closeImportModal();
+                loadProjects();
+            }, 2000);
+        }
+
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

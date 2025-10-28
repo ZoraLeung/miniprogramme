@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班型管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link active">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1 class="page-title">班型管理</h1>
+                <p class="page-subtitle">管理不同项目的培训班型和报名配置</p>
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <div class="stats-update-time" id="totalClassesTime">刚刚</div>
+                    <div class="stats-number" id="totalClasses">0</div>
+                    <div class="stats-label">总班型数</div>
+                    <div class="stats-description">系统中创建的所有班型总数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="activeClassesTime">刚刚</div>
+                    <div class="stats-number" id="activeClasses">0</div>
+                    <div class="stats-label">开放报名</div>
+                    <div class="stats-description">当前正在开放报名的班型数量</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-update-time" id="fullClassesTime">刚刚</div>
+                    <div class="stats-number" id="fullClasses">0</div>
+                    <div class="stats-label">名额已满</div>
+                    <div class="stats-description">报名人数已达上限的班型数量</div>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-primary" onclick="showAddClassModal()">
+                        <i class="fas fa-plus"></i> 新建班型
+                    </button>
+                    <button class="btn btn-success" onclick="exportClasses()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn btn-warning" onclick="showImportModal()">
+                        <i class="fas fa-upload"></i> 导入数据
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <select class="form-select" style="width: 150px;" onchange="filterClasses()" id="projectFilter">
+                        <option value="">全部项目</option>
+                    </select>
+                    <select class="form-select" style="width: 120px;" onchange="filterClasses()" id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="active">开放报名</option>
+                        <option value="full">名额已满</option>
+                        <option value="inactive">暂停报名</option>
+                    </select>
+                    <input type="text" class="search-box" placeholder="搜索班型名称" id="searchInput">
+                    <button class="btn btn-secondary" onclick="searchClasses()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>班型ID</th>
+                                <th>班型名称</th>
+                                <th>所属项目</th>
+                                <th>非协议价</th>
+                                <th>协议价</th>
+                                <th>协议首款</th>
+                                <th>协议尾款</th>
+                                <th>报名进度</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑班型模态框 -->
+    <div id="classModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="classModalTitle">新建班型</h3>
+                <button class="modal-close" onclick="closeClassModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="classForm">
+                    <div class="form-group">
+                        <label class="form-label">班型名称 <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="className" required placeholder="请输入班型名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">所属项目 <span class="form-required">*</span></label>
+                        <select class="form-select" id="classProject" required>
+                            <option value="">请选择项目</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">非协议价（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="nonContractPrice" required 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">协议价（元）</label>
+                            <input type="number" class="form-control" id="contractPrice" 
+                                   min="0" step="0.01" placeholder="自动计算" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">协议首款（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="contractDownPayment" required 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">协议尾款（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="contractTailPayment" required 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">可报名人数</label>
+                        <input type="number" class="form-control" id="maxStudents" 
+                               min="0" placeholder="0表示不限制">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">状态</label>
+                        <select class="form-select" id="classStatus">
+                            <option value="active">开放报名</option>
+                            <option value="inactive">暂停报名</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeClassModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveClass()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入数据模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">导入班型数据</h3>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload" onclick="selectImportFile()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                    <div class="file-upload-text">点击选择Excel文件或拖拽到此处</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                        支持.xlsx/.xls格式，文件大小不超过10MB
+                    </div>
+                </div>
+                <input type="file" id="importFile" accept=".xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                
+                <div id="importPreview" style="display: none; margin-top: 20px;">
+                    <h4>导入预览</h4>
+                    <div id="importSummary"></div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>导入说明：</h5>
+                    <ul style="margin: 10px 0; padding-left: 20px; font-size: 14px; color: #666;">
+                        <li>Excel第一行应为列标题：班型名称、所属项目、非协议价、协议价、协议首款、协议尾款、可报名人数</li>
+                        <li>班型名称、所属项目及价格相关字段为必填项</li>
+                        <li>所属项目必须是已存在的项目名称</li>
+                        <li>所有价格字段必须为数字格式</li>
+                        <li>可报名人数为0表示不限制人数</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" id="importBtn" onclick="importClasses()" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let allClasses = [];
+        let filteredClasses = [];
+        let editingClassId = null;
+        let allProjects = [];
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjects();
+            loadClasses();
+
+            const downPaymentInput = document.getElementById('contractDownPayment');
+            const tailPaymentInput = document.getElementById('contractTailPayment');
+            downPaymentInput.addEventListener('input', updateContractPrice);
+            tailPaymentInput.addEventListener('input', updateContractPrice);
+        });
+
+        // 模拟项目数据
+        function generateMockProjects() {
+            return [
+                { id: 1, name: '2024年选调生培训', type: '选调生' },
+                { id: 2, name: '2024年省考培训', type: '省考' },
+                { id: 3, name: '2024年申论专项培训', type: '申论' },
+                { id: 4, name: '2024年国考培训', type: '国考' },
+                { id: 5, name: '2024年事业单位培训', type: '事业单位' }
+            ];
+        }
+
+        // 模拟班型数据
+        function generateMockClasses() {
+            const classTypes = ['regular', 'vip', 'intensive', 'weekend', 'online'];
+            const classTypeNames = ['普通班', 'VIP班', '强化班', '周末班', '网络班'];
+            const features = ['小班教学', '名师授课', '包过协议', '一对一辅导', '专项突破'];
+            const mockData = [];
+            
+            for (let i = 1; i <= 30; i++) {
+                const projectId = Math.floor(Math.random() * allProjects.length);
+                const project = allProjects[projectId];
+                const typeIndex = Math.floor(Math.random() * classTypes.length);
+                const maxStudents = Math.random() > 0.3 ? Math.floor(Math.random() * 50) + 20 : 0;
+                const currentStudents = maxStudents > 0 ? Math.floor(Math.random() * maxStudents) : Math.floor(Math.random() * 100);
+                const nonContractPrice = Math.round(Math.random() * 5000 + 1000);
+                const contractPrice = Math.round(nonContractPrice * (0.7 + Math.random() * 0.15));
+                const contractDownPayment = Math.round(contractPrice * (0.4 + Math.random() * 0.2));
+                const contractTailPayment = Math.max(contractPrice - contractDownPayment, 0);
+
+                let status = 'active';
+                if (maxStudents > 0 && currentStudents >= maxStudents) {
+                    status = 'full';
+                } else if (Math.random() > 0.8) {
+                    status = 'inactive';
+                }
+                
+                const createTime = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+                
+                mockData.push({
+                    id: i,
+                    name: `${project.name} ${classTypeNames[typeIndex]}`,
+                    projectId: project.id,
+                    projectName: project.name,
+                    nonContractPrice: nonContractPrice,
+                    contractDownPayment: contractDownPayment,
+                    contractTailPayment: contractTailPayment,
+                    contractPrice: contractPrice,
+                    maxStudents: maxStudents,
+                    currentStudents: currentStudents,
+                    description: `专业的${project.type}培训课程，适合有志于${project.type}的学员`,
+                    type: classTypes[typeIndex],
+                    typeName: classTypeNames[typeIndex],
+                    status: status,
+                    features: features.slice(0, Math.floor(Math.random() * 3) + 1).join(','),
+                    courseHours: Math.floor(Math.random() * 100) + 20,
+                    sortOrder: Math.floor(Math.random() * 100),
+                    createTime: createTime.toISOString().slice(0, 19).replace('T', ' '),
+                    creator: '管理员'
+                });
+            }
+            return mockData.sort((a, b) => b.sortOrder - a.sortOrder);
+        }
+
+        // 加载项目数据
+        function loadProjects() {
+            allProjects = generateMockProjects();
+            
+            // 填充项目筛选选项
+            const projectFilter = document.getElementById('projectFilter');
+            const classProject = document.getElementById('classProject');
+            
+            allProjects.forEach(project => {
+                // 筛选选项
+                const option1 = document.createElement('option');
+                option1.value = project.id;
+                option1.textContent = project.name;
+                projectFilter.appendChild(option1);
+                
+                // 表单选项
+                const option2 = document.createElement('option');
+                option2.value = project.id;
+                option2.textContent = project.name;
+                classProject.appendChild(option2);
+            });
+        }
+
+        // 加载班型数据
+        function loadClasses() {
+            allClasses = generateMockClasses();
+            filteredClasses = [...allClasses];
+            totalItems = filteredClasses.length;
+            renderTable();
+            updatePagination();
+            updateStatistics();
+        }
+
+        // 更新统计信息
+        function updateStatistics() {
+            const total = allClasses.length;
+            const active = allClasses.filter(c => c.status === 'active').length;
+            const full = allClasses.filter(c => c.status === 'full').length;
+            
+            animateCounter('totalClasses', total);
+            animateCounter('activeClasses', active);
+            animateCounter('fullClasses', full);
+        }
+
+        // 数字动画
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 800;
+            const increment = targetValue / (duration / 16);
+            let currentValue = 0;
+
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue);
+            }, 16);
+        }
+
+        // 获取状态信息
+        function getStatusInfo(status, current, max) {
+            if (status === 'full' || (max > 0 && current >= max)) {
+                return { text: '名额已满', class: 'status-inactive' };
+            }
+            
+            switch(status) {
+                case 'active':
+                    return { text: '开放报名', class: 'status-active' };
+                case 'inactive':
+                    return { text: '暂停报名', class: 'status-pending' };
+                default:
+                    return { text: status, class: 'status-pending' };
+            }
+        }
+
+        // 计算报名率
+        function calculateRegistrationRate(current, max) {
+            if (max <= 0) return '不限制';
+            return ((current / max) * 100).toFixed(1) + '%';
+        }
+
+        // 金额格式化
+        function formatCurrency(value) {
+            const numericValue = Number(value) || 0;
+            return '¥' + numericValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+
+        // 更新协议总价显示
+        function updateContractPrice() {
+            const downPaymentInput = document.getElementById('contractDownPayment');
+            const tailPaymentInput = document.getElementById('contractTailPayment');
+            const contractPriceInput = document.getElementById('contractPrice');
+            if (!downPaymentInput || !tailPaymentInput || !contractPriceInput) return;
+
+            const downRaw = downPaymentInput.value;
+            const tailRaw = tailPaymentInput.value;
+            if (downRaw === '' && tailRaw === '') {
+                contractPriceInput.value = '';
+                return;
+            }
+
+            const downPayment = parseFloat(downRaw) || 0;
+            const tailPayment = parseFloat(tailRaw) || 0;
+            const total = downPayment + tailPayment;
+            contractPriceInput.value = total > 0 ? total.toFixed(2) : '0.00';
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('classTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredClasses.slice(start, end);
+
+            tbody.innerHTML = pageData.map(classItem => {
+                const statusInfo = getStatusInfo(classItem.status, classItem.currentStudents, classItem.maxStudents);
+                const registrationText = classItem.maxStudents > 0 
+                    ? `${classItem.currentStudents}/${classItem.maxStudents}`
+                    : classItem.currentStudents.toString();
+                const registrationRate = calculateRegistrationRate(classItem.currentStudents, classItem.maxStudents);
+                
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="class-checkbox" value="${classItem.id}"></td>
+                        <td>${classItem.id}</td>
+                        <td>
+                            <div style="font-weight: bold;">${classItem.name}</div>
+                        </td>
+                        <td>${classItem.projectName}</td>
+                        <td><strong style="color: #f39c12;">${formatCurrency(classItem.nonContractPrice)}</strong></td>
+                        <td><strong style="color: #f39c12;">${formatCurrency(classItem.contractPrice)}</strong></td>
+                        <td>${formatCurrency(classItem.contractDownPayment)}</td>
+                        <td>${formatCurrency(classItem.contractTailPayment)}</td>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                <div style="flex: 1; background: #f0f0f0; height: 6px; border-radius: 3px; margin-right: 10px;">
+                                    <div style="height: 100%; background: ${registrationRate === '不限制' ? '#52c41a' : (parseFloat(registrationRate) >= 80 ? '#ff4d4f' : '#52c41a')}; 
+                                                width: ${registrationRate === '不限制' ? '20%' : registrationRate}; border-radius: 3px;"></div>
+                                </div>
+                                <span style="font-size: 12px; color: #666; min-width: 60px;">${registrationText}</span>
+                            </div>
+                            <div style="font-size: 11px; color: #999; margin-top: 2px;">${registrationRate}</div>
+                        </td>
+                        <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                        <td>${classItem.createTime}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="editClass(${classItem.id})" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="duplicateClass(${classItem.id})" title="复制">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="btn btn-sm ${classItem.status === 'active' ? 'btn-warning' : 'btn-secondary'}" 
+                                    onclick="toggleStatus(${classItem.id})" 
+                                    title="${classItem.status === 'active' ? '暂停报名' : '开放报名'}">
+                                <i class="fas fa-${classItem.status === 'active' ? 'pause' : 'play'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteClass(${classItem.id})" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalItems;
+        }
+
+        // 搜索班型
+        function searchClasses() {
+            applyFilters();
+        }
+
+        // 筛选班型
+        function filterClasses() {
+            applyFilters();
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const projectFilter = document.getElementById('projectFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            filteredClasses = allClasses.filter(classItem => {
+                const matchesSearch = !searchTerm || 
+                    classItem.name.toLowerCase().includes(searchTerm) ||
+                    classItem.description.toLowerCase().includes(searchTerm);
+                
+                const matchesProject = !projectFilter || classItem.projectId.toString() === projectFilter;
+                
+                let actualStatus = classItem.status;
+                if (classItem.maxStudents > 0 && classItem.currentStudents >= classItem.maxStudents) {
+                    actualStatus = 'full';
+                }
+                const matchesStatus = !statusFilter || actualStatus === statusFilter;
+                
+                return matchesSearch && matchesProject && matchesStatus;
+            });
+            
+            totalItems = filteredClasses.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示新建班型模态框
+        function showAddClassModal() {
+            editingClassId = null;
+            document.getElementById('classModalTitle').textContent = '新建班型';
+            document.getElementById('classForm').reset();
+            updateContractPrice();
+            document.getElementById('classModal').style.display = 'block';
+        }
+
+        // 关闭班型模态框
+        function closeClassModal() {
+            document.getElementById('classModal').style.display = 'none';
+            editingClassId = null;
+        }
+
+        // 编辑班型
+        function editClass(classId) {
+            const classItem = allClasses.find(c => c.id === classId);
+            if (!classItem) return;
+
+            editingClassId = classId;
+            document.getElementById('classModalTitle').textContent = '编辑班型';
+            document.getElementById('className').value = classItem.name;
+            document.getElementById('classProject').value = classItem.projectId;
+            document.getElementById('nonContractPrice').value = classItem.nonContractPrice ?? '';
+            document.getElementById('contractDownPayment').value = classItem.contractDownPayment ?? '';
+            document.getElementById('contractTailPayment').value = classItem.contractTailPayment ?? '';
+            updateContractPrice();
+            document.getElementById('maxStudents').value = classItem.maxStudents || '';
+            document.getElementById('classStatus').value = classItem.status;
+            
+            document.getElementById('classModal').style.display = 'block';
+        }
+
+        // 保存班型
+        function saveClass() {
+            const formData = {
+                name: document.getElementById('className').value.trim(),
+                projectId: parseInt(document.getElementById('classProject').value),
+                nonContractPrice: parseFloat(document.getElementById('nonContractPrice').value),
+                contractDownPayment: parseFloat(document.getElementById('contractDownPayment').value),
+                contractTailPayment: parseFloat(document.getElementById('contractTailPayment').value),
+                maxStudents: parseInt(document.getElementById('maxStudents').value) || 0,
+                status: document.getElementById('classStatus').value
+            };
+            formData.contractPrice = Number(((formData.contractDownPayment || 0) + (formData.contractTailPayment || 0)).toFixed(2));
+            document.getElementById('contractPrice').value = formData.contractPrice.toFixed(2);
+
+            // 表单验证
+            if (!formData.name) {
+                alert('请输入班型名称');
+                return;
+            }
+            if (!formData.projectId) {
+                alert('请选择所属项目');
+                return;
+            }
+            if (isNaN(formData.nonContractPrice) || formData.nonContractPrice < 0) {
+                alert('请输入正确的非协议价');
+                return;
+            }
+            if (isNaN(formData.contractDownPayment) || formData.contractDownPayment < 0) {
+                alert('请输入正确的协议首款');
+                return;
+            }
+            if (isNaN(formData.contractTailPayment) || formData.contractTailPayment < 0) {
+                alert('请输入正确的协议尾款');
+                return;
+            }
+
+            // 获取项目信息
+            const project = allProjects.find(p => p.id === formData.projectId);
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            if (editingClassId) {
+                // 编辑模式
+                const classIndex = allClasses.findIndex(c => c.id === editingClassId);
+                allClasses[classIndex] = {
+                    ...allClasses[classIndex],
+                    ...formData,
+                    projectName: project.name
+                };
+                showNotification('班型更新成功', 'success');
+            } else {
+                // 新增模式
+                const newClass = {
+                    id: Math.max(...allClasses.map(c => c.id), 0) + 1,
+                    ...formData,
+                    projectName: project.name,
+                    typeName: '普通班', // 默认类型
+                    type: 'regular',
+                    description: '',
+                    features: '',
+                    courseHours: 0,
+                    sortOrder: 0,
+                    currentStudents: 0,
+                    createTime: now,
+                    creator: '管理员'
+                };
+                allClasses.unshift(newClass);
+                showNotification('班型创建成功', 'success');
+            }
+
+            closeClassModal();
+            applyFilters();
+            updateStatistics();
+        }
+
+        // 复制班型
+        function duplicateClass(classId) {
+            const classItem = allClasses.find(c => c.id === classId);
+            if (!classItem) return;
+
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            const newClass = {
+                ...classItem,
+                id: Math.max(...allClasses.map(c => c.id), 0) + 1,
+                name: classItem.name + ' (副本)',
+                currentStudents: 0,
+                status: 'active',
+                createTime: now
+            };
+
+            allClasses.unshift(newClass);
+            showNotification('班型复制成功', 'success');
+            applyFilters();
+            updateStatistics();
+        }
+
+        // 切换状态
+        function toggleStatus(classId) {
+            const classItem = allClasses.find(c => c.id === classId);
+            if (!classItem) return;
+
+            // 检查是否名额已满
+            if (classItem.maxStudents > 0 && classItem.currentStudents >= classItem.maxStudents) {
+                if (classItem.status === 'inactive') {
+                    classItem.status = 'active';
+                    showNotification('班型已开放报名', 'success');
+                } else {
+                    alert('名额已满，无法暂停报名');
+                    return;
+                }
+            } else {
+                const newStatus = classItem.status === 'active' ? 'inactive' : 'active';
+                classItem.status = newStatus;
+                
+                const action = newStatus === 'active' ? '开放报名' : '暂停报名';
+                showNotification(`班型${action}成功`, 'success');
+            }
+            
+            renderTable();
+            updateStatistics();
+        }
+
+        // 删除班型
+        function deleteClass(classId) {
+            const classItem = allClasses.find(c => c.id === classId);
+            if (!classItem) return;
+
+            if (classItem.currentStudents > 0) {
+                if (!confirm(`该班型已有 ${classItem.currentStudents} 人报名，删除后将影响已报名学员，确定要删除吗？`)) {
+                    return;
+                }
+            }
+
+            if (confirm(`确定要删除班型"${classItem.name}"吗？`)) {
+                allClasses = allClasses.filter(c => c.id !== classId);
+                showNotification('班型删除成功', 'success');
+                applyFilters();
+                updateStatistics();
+            }
+        }
+
+        // 批量选择
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.class-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // 导出班型数据
+        function exportClasses() {
+            const csvContent = generateCSV(filteredClasses);
+            downloadCSV(csvContent, 'classes.csv');
+            showNotification('班型数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['班型ID', '班型名称', '所属项目', '非协议价', '协议价', '协议首款', '协议尾款', '可报名人数', '已报名人数', '班型类型', '状态', '创建时间'];
+            const rows = data.map(classItem => {
+                const statusInfo = getStatusInfo(classItem.status, classItem.currentStudents, classItem.maxStudents);
+                return [
+                    classItem.id,
+                    classItem.name,
+                    classItem.projectName,
+                    classItem.nonContractPrice,
+                    classItem.contractPrice,
+                    classItem.contractDownPayment,
+                    classItem.contractTailPayment,
+                    classItem.maxStudents || '不限制',
+                    classItem.currentStudents,
+                    classItem.typeName,
+                    statusInfo.text,
+                    classItem.createTime
+                ];
+            });
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // 导入相关功能
+        function showImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importBtn').disabled = true;
+        }
+
+        function selectImportFile() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('importSummary').innerHTML = `
+                <p>文件名：${file.name}</p>
+                <p>文件大小：${(file.size / 1024).toFixed(2)} KB</p>
+                <p>准备导入班型数据...</p>
+            `;
+            document.getElementById('importPreview').style.display = 'block';
+            document.getElementById('importBtn').disabled = false;
+        }
+
+        function importClasses() {
+            showNotification('正在导入班型数据...', 'info');
+            setTimeout(() => {
+                showNotification('班型数据导入成功', 'success');
+                closeImportModal();
+                loadClasses();
+            }, 2000);
+        }
+
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

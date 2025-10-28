@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账号管理 - 学员报名管理系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">报名管理系统</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            仪表盘
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            用户管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blacklist.html" class="nav-link">
+                            <i class="fas fa-ban"></i>
+                            黑名单管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="projects.html" class="nav-link">
+                            <i class="fas fa-project-diagram"></i>
+                            项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="classes.html" class="nav-link">
+                            <i class="fas fa-graduation-cap"></i>
+                            班型管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="discounts.html" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            优惠管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="registrations-projects.html" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            报名管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="positions-projects.html" class="nav-link">
+                            <i class="fas fa-briefcase"></i>
+                            招考岗位管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounts.html" class="nav-link active">
+                            <i class="fas fa-user-cog"></i>
+                            账号管理
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">账号管理</h1>
+                    <p class="page-subtitle">管理系统管理员和操作员账号</p>
+                </div>
+                <!-- 用户信息区域 -->
+                <div class="user-info">
+                    <button class="user-action-btn user-profile-btn" type="button" onclick="showProfileModal()">
+                        <i class="fas fa-id-card"></i>
+                        个人信息
+                    </button>
+                    <button class="user-name-btn" type="button" onclick="logout()">
+                        <span id="currentUserDisplay" data-role="current-username">用户名</span>
+                    </button>
+                </div>
+            </div>
+
+  
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-primary" onclick="showAddAccountModal()">
+                        <i class="fas fa-plus"></i> 新建账号
+                    </button>
+                    <button class="btn btn-success" onclick="exportAccounts()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn btn-warning" onclick="batchToggleStatus()">
+                        <i class="fas fa-toggle-on"></i> 批量启用/禁用
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <select class="form-select" style="width: 150px;" onchange="filterAccounts()" id="adminFilter">
+                        <option value="">全部账号</option>
+                        <option value="yes">管理员</option>
+                        <option value="no">非管理员</option>
+                    </select>
+                    <select class="form-select" style="width: 120px;" onchange="filterAccounts()" id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="active">启用</option>
+                        <option value="inactive">禁用</option>
+                    </select>
+                    <input type="text" class="search-box" placeholder="搜索用户名或姓名" id="searchInput">
+                    <button class="btn btn-secondary" onclick="searchAccounts()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>账号ID</th>
+                                <th>用户名</th>
+                                <th>姓名</th>
+                                <th>是否管理员</th>
+                                <th>状态</th>
+                                <th>最后登录</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountTableBody">
+                            <!-- 数据行将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" style="justify-content: flex-end;">
+                <div class="pagination-info">
+                    显示第 <span id="startRecord">1</span> 至 <span id="endRecord">10</span> 项，共 <span id="totalRecords">0</span> 项
+                </div>
+                <div>
+                    <a href="#" class="pagination-btn" onclick="changePage('prev')" id="prevBtn">上一页</a>
+                    <a href="#" class="pagination-btn active" onclick="changePage(1)">1</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(2)">2</a>
+                    <a href="#" class="pagination-btn" onclick="changePage(3)">3</a>
+                    <a href="#" class="pagination-btn" onclick="changePage('next')" id="nextBtn">下一页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑账号模态框 -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="accountModalTitle">新建账号</h3>
+                <button class="modal-close" onclick="closeAccountModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="accountForm">
+                    <div class="form-group">
+                        <label class="form-label">用户名 <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="username" required placeholder="请输入用户名">
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">用户名创建后不可修改，只能包含字母、数字和下划线</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">姓名 <span class="form-required">*</span></label>
+                        <input type="text" class="form-control" id="realName" required placeholder="请输入真实姓名">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">密码 <span class="form-required" id="passwordRequired">*</span></label>
+                        <input type="password" class="form-control" id="password" id="password" placeholder="请输入密码">
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">密码长度至少6位，建议包含字母和数字</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">是否管理员 <span class="form-required">*</span></label>
+                            <select class="form-select" id="isAdmin" required>
+                                <option value="true">是</option>
+                                <option value="false">否</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="status">
+                                <option value="active">启用</option>
+                                <option value="inactive">禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" class="form-control" id="email" placeholder="请输入邮箱地址（可选）">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">手机号</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="请输入手机号码（可选）">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-control form-textarea" id="description" 
+                                  placeholder="账号相关备注信息（可选）"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAccountModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveAccount()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重置密码模态框 -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title">重置密码</h3>
+                <button class="modal-close" onclick="closeResetPasswordModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">新密码 <span class="form-required">*</span></label>
+                    <input type="password" class="form-control" id="newPassword" required placeholder="请输入新密码">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">确认密码 <span class="form-required">*</span></label>
+                    <input type="password" class="form-control" id="confirmPassword" required placeholder="请再次输入新密码">
+                </div>
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 4px; margin-top: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #495057;">密码要求：</div>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #6c757d;">
+                        <li>长度至少6位字符</li>
+                        <li>建议包含字母和数字</li>
+                        <li>不要使用过于简单的密码</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeResetPasswordModal()">取消</button>
+                <button class="btn btn-primary" onclick="resetPassword()">重置密码</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/user.js"></script>
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalItems = 0;
+        let allAccounts = [];
+        let filteredAccounts = [];
+        let editingAccountId = null;
+        let resettingAccountId = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAccounts();
+        });
+
+        // 模拟账号数据
+        function generateMockAccounts() {
+            const statuses = ['active', 'inactive'];
+            const firstNames = ['张', '李', '王', '刘', '陈', '杨', '赵', '黄', '周', '吴'];
+            const lastNames = ['伟', '芳', '娜', '敏', '静', '丽', '强', '磊', '军', '洋'];
+            const mockData = [];
+            
+            // 添加默认管理员账号
+            mockData.push({
+                id: 1,
+                username: 'admin',
+                realName: '系统管理员',
+                password: 'admin123',
+                isAdmin: true,
+                status: 'active',
+                email: 'admin@example.com',
+                phone: '13800138000',
+                description: '系统默认管理员账号',
+                lastLoginTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
+                createTime: '2024-01-01 09:00:00',
+                creator: '系统'
+            });
+
+            // 添加默认操作员账号
+            mockData.push({
+                id: 2,
+                username: 'operator',
+                realName: '数据操作员',
+                password: 'op123',
+                isAdmin: false,
+                status: 'active',
+                email: 'operator@example.com',
+                phone: '13800138001',
+                description: '系统默认操作员账号',
+                lastLoginTime: new Date(Date.now() - 30 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
+                createTime: '2024-01-01 09:30:00',
+                creator: 'admin'
+            });
+
+            // 生成更多模拟账号
+            for (let i = 3; i <= 20; i++) {
+                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const createTime = new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000); // 过去90天内
+                
+                mockData.push({
+                    id: i,
+                    username: `user${i}`,
+                    realName: firstName + lastName,
+                    password: 'password123',
+                    isAdmin: Math.random() > 0.7,
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    email: `user${i}@example.com`,
+                    phone: `138${String(Math.floor(Math.random() * 100000000)).padStart(8, '0')}`,
+                    description: `${firstName + lastName}的账号`,
+                    lastLoginTime: Math.random() > 0.3 ? 
+                        new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ') : 
+                        '从未登录',
+                    createTime: createTime.toISOString().slice(0, 19).replace('T', ' '),
+                    creator: 'admin'
+                });
+            }
+            
+            return mockData.sort((a, b) => b.id - a.id);
+        }
+
+        // 加载账号数据
+        function loadAccounts() {
+            allAccounts = generateMockAccounts();
+            filteredAccounts = [...allAccounts];
+            totalItems = filteredAccounts.length;
+            renderTable();
+            updatePagination();
+        }
+
+    
+        // 获取管理员标识的显示文本和样式
+        function getAdminInfo(isAdmin) {
+            if (isAdmin) {
+                return { text: '是', class: 'status-active' };
+            }
+            return { text: '否', class: 'status-pending' };
+        }
+
+        // 获取状态显示文本和样式
+        function getStatusInfo(status) {
+            switch(status) {
+                case 'active':
+                    return { text: '启用', class: 'status-active' };
+                case 'inactive':
+                    return { text: '禁用', class: 'status-inactive' };
+                default:
+                    return { text: status, class: 'status-pending' };
+            }
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('accountTableBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredAccounts.slice(start, end);
+
+            tbody.innerHTML = pageData.map(account => {
+                const adminInfo = getAdminInfo(account.isAdmin);
+                const statusInfo = getStatusInfo(account.status);
+                
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="account-checkbox" value="${account.id}"></td>
+                        <td>${account.id}</td>
+                        <td><strong>${account.username}</strong></td>
+                        <td>${account.realName}</td>
+                        <td><span class="status-badge ${adminInfo.class}">${adminInfo.text}</span></td>
+                        <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                        <td>${account.lastLoginTime}</td>
+                        <td>${account.createTime}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-primary" onclick="editAccount(${account.id})" title="编辑">
+                                <i class="fas fa-edit"></i> 编辑
+                            </button>
+                            <button class="btn btn-warning" onclick="resetAccountPassword(${account.id})" title="重置密码">
+                                <i class="fas fa-key"></i> 重置密码
+                            </button>
+                            <button class="btn ${account.status === 'active' ? 'btn-secondary' : 'btn-success'}" 
+                                    onclick="toggleAccountStatus(${account.id})" 
+                                    title="${account.status === 'active' ? '禁用' : '启用'}">
+                                <i class="fas fa-${account.status === 'active' ? 'ban' : 'check'}"></i> ${account.status === 'active' ? '禁用' : '启用'}
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteAccount(${account.id})" title="删除">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新分页信息
+        function updatePagination() {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            
+            document.getElementById('startRecord').textContent = start;
+            document.getElementById('endRecord').textContent = end;
+            document.getElementById('totalRecords').textContent = totalItems;
+        }
+
+        // 搜索账号
+        function searchAccounts() {
+            applyFilters();
+        }
+
+        // 筛选账号
+        function filterAccounts() {
+            applyFilters();
+        }
+
+        // 应用筛选条件
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const adminFilter = document.getElementById('adminFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            filteredAccounts = allAccounts.filter(account => {
+                const matchesSearch = !searchTerm || 
+                    account.username.toLowerCase().includes(searchTerm) ||
+                    account.realName.toLowerCase().includes(searchTerm);
+                
+                const matchesAdmin = !adminFilter || (adminFilter === 'yes' && account.isAdmin) || (adminFilter === 'no' && !account.isAdmin);
+                const matchesStatus = !statusFilter || account.status === statusFilter;
+                
+                return matchesSearch && matchesAdmin && matchesStatus;
+            });
+            
+            totalItems = filteredAccounts.length;
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示新建账号模态框
+        function showAddAccountModal() {
+            editingAccountId = null;
+            document.getElementById('accountModalTitle').textContent = '新建账号';
+            document.getElementById('accountForm').reset();
+            document.getElementById('passwordRequired').style.display = 'inline';
+            document.getElementById('password').required = true;
+            document.getElementById('status').value = 'active';
+            document.getElementById('isAdmin').value = 'false';
+            document.getElementById('accountModal').style.display = 'block';
+        }
+
+        // 关闭账号模态框
+        function closeAccountModal() {
+            document.getElementById('accountModal').style.display = 'none';
+            editingAccountId = null;
+        }
+
+        // 编辑账号
+        function editAccount(accountId) {
+            const account = allAccounts.find(a => a.id === accountId);
+            if (!account) return;
+
+            editingAccountId = accountId;
+            document.getElementById('accountModalTitle').textContent = '编辑账号';
+            
+            document.getElementById('username').value = account.username;
+            document.getElementById('realName').value = account.realName;
+            document.getElementById('isAdmin').value = account.isAdmin ? 'true' : 'false';
+            document.getElementById('status').value = account.status;
+            document.getElementById('email').value = account.email || '';
+            document.getElementById('phone').value = account.phone || '';
+            document.getElementById('description').value = account.description || '';
+            
+            // 编辑模式下密码非必填
+            document.getElementById('passwordRequired').style.display = 'none';
+            document.getElementById('password').required = false;
+            document.getElementById('password').placeholder = '留空表示不修改密码';
+            
+            document.getElementById('accountModal').style.display = 'block';
+        }
+
+        // 保存账号
+        function saveAccount() {
+            const formData = {
+                username: document.getElementById('username').value.trim(),
+                realName: document.getElementById('realName').value.trim(),
+                password: document.getElementById('password').value,
+                isAdmin: document.getElementById('isAdmin').value === 'true',
+                status: document.getElementById('status').value,
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                description: document.getElementById('description').value.trim()
+            };
+
+            // 表单验证
+            if (!formData.username) {
+                alert('请输入用户名');
+                return;
+            }
+            if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+                alert('用户名只能包含字母、数字和下划线');
+                return;
+            }
+            if (!formData.realName) {
+                alert('请输入姓名');
+                return;
+            }
+            if (formData.password && formData.password.length < 6) {
+                alert('密码长度至少6位');
+                return;
+            }
+
+            // 检查用户名重复（新增模式）
+            if (!editingAccountId) {
+                if (!formData.password) {
+                    alert('新建账号时密码为必填项');
+                    return;
+                }
+                if (allAccounts.some(a => a.username === formData.username)) {
+                    alert('用户名已存在');
+                    return;
+                }
+            }
+
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            if (editingAccountId) {
+                // 编辑模式
+                const accountIndex = allAccounts.findIndex(a => a.id === editingAccountId);
+                const updateData = {
+                    ...allAccounts[accountIndex],
+                    realName: formData.realName,
+                    isAdmin: formData.isAdmin,
+                    status: formData.status,
+                    email: formData.email,
+                    phone: formData.phone,
+                    description: formData.description
+                };
+                
+                // 如果填写了新密码
+                if (formData.password) {
+                    updateData.password = formData.password;
+                }
+                
+                allAccounts[accountIndex] = updateData;
+                showNotification('账号更新成功', 'success');
+            } else {
+                // 新增模式
+                const newAccount = {
+                    id: Math.max(...allAccounts.map(a => a.id), 0) + 1,
+                    username: formData.username,
+                    realName: formData.realName,
+                    password: formData.password,
+                    isAdmin: formData.isAdmin,
+                    status: formData.status,
+                    email: formData.email,
+                    phone: formData.phone,
+                    description: formData.description,
+                    lastLoginTime: '从未登录',
+                    createTime: now,
+                    creator: getCurrentUser()
+                };
+                allAccounts.unshift(newAccount);
+                showNotification('账号创建成功', 'success');
+            }
+
+            closeAccountModal();
+            applyFilters();
+        }
+
+        // 获取当前用户
+        function getCurrentUser() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            return currentUser.username || 'admin';
+        }
+
+        // 切换账号状态
+        function toggleAccountStatus(accountId) {
+            const account = allAccounts.find(a => a.id === accountId);
+            if (!account) return;
+
+            // 防止禁用当前登录的管理员账号
+            if (account.username === getCurrentUser() && account.status === 'active') {
+                if (!confirm('确定要禁用当前登录的账号吗？禁用后需要其他管理员重新启用。')) {
+                    return;
+                }
+            }
+
+            const newStatus = account.status === 'active' ? 'inactive' : 'active';
+            account.status = newStatus;
+            
+            const action = newStatus === 'active' ? '启用' : '禁用';
+            showNotification(`账号${action}成功`, 'success');
+            
+            renderTable();
+        }
+
+        // 重置账号密码
+        function resetAccountPassword(accountId) {
+            const account = allAccounts.find(a => a.id === accountId);
+            if (!account) return;
+
+            resettingAccountId = accountId;
+            document.getElementById('resetPasswordModal').style.display = 'block';
+        }
+
+        // 关闭重置密码模态框
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').style.display = 'none';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            resettingAccountId = null;
+        }
+
+        // 重置密码
+        function resetPassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!newPassword || !confirmPassword) {
+                alert('请输入新密码和确认密码');
+                return;
+            }
+            if (newPassword.length < 6) {
+                alert('密码长度至少6位');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+
+            const account = allAccounts.find(a => a.id === resettingAccountId);
+            if (account) {
+                account.password = newPassword;
+                showNotification(`账号 "${account.username}" 密码重置成功`, 'success');
+                closeResetPasswordModal();
+            }
+        }
+
+        // 删除账号
+        function deleteAccount(accountId) {
+            const account = allAccounts.find(a => a.id === accountId);
+            if (!account) return;
+
+            // 防止删除当前登录账号
+            if (account.username === getCurrentUser()) {
+                alert('不能删除当前登录的账号');
+                return;
+            }
+
+            // 防止删除默认管理员账号
+            if (account.id === 1) {
+                alert('不能删除系统默认管理员账号');
+                return;
+            }
+
+            if (confirm(`确定要删除账号"${account.username}"吗？此操作不可恢复。`)) {
+                allAccounts = allAccounts.filter(a => a.id !== accountId);
+                showNotification('账号删除成功', 'success');
+                applyFilters();
+            }
+        }
+
+        // 批量选择
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.account-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // 批量切换状态
+        function batchToggleStatus() {
+            const selectedCheckboxes = document.querySelectorAll('.account-checkbox:checked');
+            if (selectedCheckboxes.length === 0) {
+                alert('请先选择要操作的账号');
+                return;
+            }
+
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
+            const selectedAccounts = allAccounts.filter(a => selectedIds.includes(a.id));
+
+            // 检查是否包含当前登录账号
+            const currentUserAccount = selectedAccounts.find(a => a.username === getCurrentUser());
+            if (currentUserAccount) {
+                alert('不能批量操作包含当前登录的账号');
+                return;
+            }
+
+            const action = confirm(`确定要批量${selectedAccounts.some(a => a.status === 'active') ? '禁用' : '启用'}选中的 ${selectedAccounts.length} 个账号吗？`);
+            if (action) {
+                const targetStatus = selectedAccounts.some(a => a.status === 'active') ? 'inactive' : 'active';
+                selectedAccounts.forEach(account => {
+                    account.status = targetStatus;
+                });
+                showNotification(`批量操作成功，${selectedAccounts.length} 个账号已${targetStatus === 'active' ? '启用' : '禁用'}`, 'success');
+                renderTable();
+              }
+        }
+
+        // 导出账号数据
+        function exportAccounts() {
+            const csvContent = generateCSV(filteredAccounts);
+            downloadCSV(csvContent, 'accounts.csv');
+            showNotification('账号数据导出成功', 'success');
+        }
+
+        // 生成CSV内容
+        function generateCSV(data) {
+            const headers = ['账号ID', '用户名', '姓名', '是否管理员', '状态', '邮箱', '手机号', '最后登录', '创建时间'];
+            const rows = data.map(account => {
+                const adminInfo = getAdminInfo(account.isAdmin);
+                const statusInfo = getStatusInfo(account.status);
+                return [
+                    account.id,
+                    account.username,
+                    account.realName,
+                    adminInfo.text,
+                    statusInfo.text,
+                    account.email || '',
+                    account.phone || '',
+                    account.lastLoginTime,
+                    account.createTime
+                ];
+            });
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // 下载CSV文件
+        function downloadCSV(content, filename) {
+            const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            
+            if (page === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (page === 'next' && currentPage < totalPages) {
+                currentPage++;
+            } else if (typeof page === 'number' && page >= 1 && page <= totalPages) {
+                currentPage = page;
+            }
+            
+            renderTable();
+            updatePagination();
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-size: 14px;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#52c41a';
+                    break;
+                case 'error':
+                    notification.style.background = '#ff4d4f';
+                    break;
+                case 'warning':
+                    notification.style.background = '#faad14';
+                    break;
+                default:
+                    notification.style.background = '#1890ff';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
