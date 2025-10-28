@@ -156,9 +156,11 @@
                                 <th>班型名称</th>
                                 <th>所属项目</th>
                                 <th>非协议价</th>
-                                <th>协议价</th>
-                                <th>协议首款</th>
-                                <th>协议尾款</th>
+                                <th>小围协议价</th>
+                                <th>中围协议价</th>
+                                <th>大围协议价</th>
+                                <th>小围协议首款</th>
+                                <th>中/大围协议首款</th>
                                 <th>报名进度</th>
                                 <th>状态</th>
                                 <th>创建时间</th>
@@ -207,25 +209,35 @@
                             <option value="">请选择项目</option>
                         </select>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                         <div class="form-group">
                             <label class="form-label">非协议价（元） <span class="form-required">*</span></label>
                             <input type="number" class="form-control" id="nonContractPrice" required 
                                    min="0" step="0.01" placeholder="0.00">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">协议价（元）</label>
-                            <input type="number" class="form-control" id="contractPrice" 
-                                   min="0" step="0.01" placeholder="自动计算" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">协议首款（元） <span class="form-required">*</span></label>
-                            <input type="number" class="form-control" id="contractDownPayment" required 
+                            <label class="form-label">小围协议价（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="smallContractPrice" required 
                                    min="0" step="0.01" placeholder="0.00">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">协议尾款（元） <span class="form-required">*</span></label>
-                            <input type="number" class="form-control" id="contractTailPayment" required 
+                            <label class="form-label">中围协议价（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="mediumContractPrice" required 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">大围协议价（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="largeContractPrice" required 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">小围协议首款（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="smallContractDownPayment" required 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">中/大围协议首款（元） <span class="form-required">*</span></label>
+                            <input type="number" class="form-control" id="mediumLargeContractDownPayment" required 
                                    min="0" step="0.01" placeholder="0.00">
                         </div>
                     </div>
@@ -275,7 +287,7 @@
                 <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
                     <h5>导入说明：</h5>
                     <ul style="margin: 10px 0; padding-left: 20px; font-size: 14px; color: #666;">
-                        <li>Excel第一行应为列标题：班型名称、所属项目、非协议价、协议价、协议首款、协议尾款、可报名人数</li>
+                        <li>Excel第一行应为列标题：班型名称、所属项目、非协议价、小围协议价、中围协议价、大围协议价、小围协议首款、中/大围协议首款、可报名人数</li>
                         <li>班型名称、所属项目及价格相关字段为必填项</li>
                         <li>所属项目必须是已存在的项目名称</li>
                         <li>所有价格字段必须为数字格式</li>
@@ -306,10 +318,7 @@
             loadProjects();
             loadClasses();
 
-            const downPaymentInput = document.getElementById('contractDownPayment');
-            const tailPaymentInput = document.getElementById('contractTailPayment');
-            downPaymentInput.addEventListener('input', updateContractPrice);
-            tailPaymentInput.addEventListener('input', updateContractPrice);
+            // Remove old price calculation listeners
         });
 
         // 模拟项目数据
@@ -337,9 +346,11 @@
                 const maxStudents = Math.random() > 0.3 ? Math.floor(Math.random() * 50) + 20 : 0;
                 const currentStudents = maxStudents > 0 ? Math.floor(Math.random() * maxStudents) : Math.floor(Math.random() * 100);
                 const nonContractPrice = Math.round(Math.random() * 5000 + 1000);
-                const contractPrice = Math.round(nonContractPrice * (0.7 + Math.random() * 0.15));
-                const contractDownPayment = Math.round(contractPrice * (0.4 + Math.random() * 0.2));
-                const contractTailPayment = Math.max(contractPrice - contractDownPayment, 0);
+                const smallContractPrice = Math.round(nonContractPrice * (0.9 + Math.random() * 0.1));
+                const mediumContractPrice = Math.round(nonContractPrice * (0.8 + Math.random() * 0.1));
+                const largeContractPrice = Math.round(nonContractPrice * (0.7 + Math.random() * 0.1));
+                const smallContractDownPayment = Math.round(smallContractPrice * (0.4 + Math.random() * 0.2));
+                const mediumLargeContractDownPayment = Math.round(mediumContractPrice * (0.4 + Math.random() * 0.2));
 
                 let status = 'active';
                 if (maxStudents > 0 && currentStudents >= maxStudents) {
@@ -356,9 +367,11 @@
                     projectId: project.id,
                     projectName: project.name,
                     nonContractPrice: nonContractPrice,
-                    contractDownPayment: contractDownPayment,
-                    contractTailPayment: contractTailPayment,
-                    contractPrice: contractPrice,
+                    smallContractPrice: smallContractPrice,
+                    mediumContractPrice: mediumContractPrice,
+                    largeContractPrice: largeContractPrice,
+                    smallContractDownPayment: smallContractDownPayment,
+                    mediumLargeContractDownPayment: mediumLargeContractDownPayment,
                     maxStudents: maxStudents,
                     currentStudents: currentStudents,
                     description: `专业的${project.type}培训课程，适合有志于${project.type}的学员`,
@@ -464,25 +477,7 @@
             return '¥' + numericValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         }
 
-        // 更新协议总价显示
-        function updateContractPrice() {
-            const downPaymentInput = document.getElementById('contractDownPayment');
-            const tailPaymentInput = document.getElementById('contractTailPayment');
-            const contractPriceInput = document.getElementById('contractPrice');
-            if (!downPaymentInput || !tailPaymentInput || !contractPriceInput) return;
-
-            const downRaw = downPaymentInput.value;
-            const tailRaw = tailPaymentInput.value;
-            if (downRaw === '' && tailRaw === '') {
-                contractPriceInput.value = '';
-                return;
-            }
-
-            const downPayment = parseFloat(downRaw) || 0;
-            const tailPayment = parseFloat(tailRaw) || 0;
-            const total = downPayment + tailPayment;
-            contractPriceInput.value = total > 0 ? total.toFixed(2) : '0.00';
-        }
+        // Removed updateContractPrice function as it's no longer needed
 
         // 渲染表格
         function renderTable() {
@@ -507,9 +502,11 @@
                         </td>
                         <td>${classItem.projectName}</td>
                         <td><strong style="color: #f39c12;">${formatCurrency(classItem.nonContractPrice)}</strong></td>
-                        <td><strong style="color: #f39c12;">${formatCurrency(classItem.contractPrice)}</strong></td>
-                        <td>${formatCurrency(classItem.contractDownPayment)}</td>
-                        <td>${formatCurrency(classItem.contractTailPayment)}</td>
+                        <td><strong style="color: #f39c12;">${formatCurrency(classItem.smallContractPrice)}</strong></td>
+                        <td><strong style="color: #f39c12;">${formatCurrency(classItem.mediumContractPrice)}</strong></td>
+                        <td><strong style="color: #f39c12;">${formatCurrency(classItem.largeContractPrice)}</strong></td>
+                        <td>${formatCurrency(classItem.smallContractDownPayment)}</td>
+                        <td>${formatCurrency(classItem.mediumLargeContractDownPayment)}</td>
                         <td>
                             <div style="display: flex; align-items: center;">
                                 <div style="flex: 1; background: #f0f0f0; height: 6px; border-radius: 3px; margin-right: 10px;">
@@ -596,7 +593,6 @@
             editingClassId = null;
             document.getElementById('classModalTitle').textContent = '新建班型';
             document.getElementById('classForm').reset();
-            updateContractPrice();
             document.getElementById('classModal').style.display = 'block';
         }
 
@@ -616,9 +612,11 @@
             document.getElementById('className').value = classItem.name;
             document.getElementById('classProject').value = classItem.projectId;
             document.getElementById('nonContractPrice').value = classItem.nonContractPrice ?? '';
-            document.getElementById('contractDownPayment').value = classItem.contractDownPayment ?? '';
-            document.getElementById('contractTailPayment').value = classItem.contractTailPayment ?? '';
-            updateContractPrice();
+            document.getElementById('smallContractPrice').value = classItem.smallContractPrice ?? '';
+            document.getElementById('mediumContractPrice').value = classItem.mediumContractPrice ?? '';
+            document.getElementById('largeContractPrice').value = classItem.largeContractPrice ?? '';
+            document.getElementById('smallContractDownPayment').value = classItem.smallContractDownPayment ?? '';
+            document.getElementById('mediumLargeContractDownPayment').value = classItem.mediumLargeContractDownPayment ?? '';
             document.getElementById('maxStudents').value = classItem.maxStudents || '';
             document.getElementById('classStatus').value = classItem.status;
             
@@ -631,13 +629,14 @@
                 name: document.getElementById('className').value.trim(),
                 projectId: parseInt(document.getElementById('classProject').value),
                 nonContractPrice: parseFloat(document.getElementById('nonContractPrice').value),
-                contractDownPayment: parseFloat(document.getElementById('contractDownPayment').value),
-                contractTailPayment: parseFloat(document.getElementById('contractTailPayment').value),
+                smallContractPrice: parseFloat(document.getElementById('smallContractPrice').value),
+                mediumContractPrice: parseFloat(document.getElementById('mediumContractPrice').value),
+                largeContractPrice: parseFloat(document.getElementById('largeContractPrice').value),
+                smallContractDownPayment: parseFloat(document.getElementById('smallContractDownPayment').value),
+                mediumLargeContractDownPayment: parseFloat(document.getElementById('mediumLargeContractDownPayment').value),
                 maxStudents: parseInt(document.getElementById('maxStudents').value) || 0,
                 status: document.getElementById('classStatus').value
             };
-            formData.contractPrice = Number(((formData.contractDownPayment || 0) + (formData.contractTailPayment || 0)).toFixed(2));
-            document.getElementById('contractPrice').value = formData.contractPrice.toFixed(2);
 
             // 表单验证
             if (!formData.name) {
@@ -652,12 +651,24 @@
                 alert('请输入正确的非协议价');
                 return;
             }
-            if (isNaN(formData.contractDownPayment) || formData.contractDownPayment < 0) {
-                alert('请输入正确的协议首款');
+            if (isNaN(formData.smallContractPrice) || formData.smallContractPrice < 0) {
+                alert('请输入正确的小围协议价');
                 return;
             }
-            if (isNaN(formData.contractTailPayment) || formData.contractTailPayment < 0) {
-                alert('请输入正确的协议尾款');
+            if (isNaN(formData.mediumContractPrice) || formData.mediumContractPrice < 0) {
+                alert('请输入正确的中围协议价');
+                return;
+            }
+            if (isNaN(formData.largeContractPrice) || formData.largeContractPrice < 0) {
+                alert('请输入正确的大围协议价');
+                return;
+            }
+            if (isNaN(formData.smallContractDownPayment) || formData.smallContractDownPayment < 0) {
+                alert('请输入正确的小围协议首款');
+                return;
+            }
+            if (isNaN(formData.mediumLargeContractDownPayment) || formData.mediumLargeContractDownPayment < 0) {
+                alert('请输入正确的中/大围协议首款');
                 return;
             }
 
@@ -781,7 +792,7 @@
 
         // 生成CSV内容
         function generateCSV(data) {
-            const headers = ['班型ID', '班型名称', '所属项目', '非协议价', '协议价', '协议首款', '协议尾款', '可报名人数', '已报名人数', '班型类型', '状态', '创建时间'];
+            const headers = ['班型ID', '班型名称', '所属项目', '非协议价', '小围协议价', '中围协议价', '大围协议价', '小围协议首款', '中/大围协议首款', '可报名人数', '已报名人数', '班型类型', '状态', '创建时间'];
             const rows = data.map(classItem => {
                 const statusInfo = getStatusInfo(classItem.status, classItem.currentStudents, classItem.maxStudents);
                 return [
@@ -789,9 +800,11 @@
                     classItem.name,
                     classItem.projectName,
                     classItem.nonContractPrice,
-                    classItem.contractPrice,
-                    classItem.contractDownPayment,
-                    classItem.contractTailPayment,
+                    classItem.smallContractPrice,
+                    classItem.mediumContractPrice,
+                    classItem.largeContractPrice,
+                    classItem.smallContractDownPayment,
+                    classItem.mediumLargeContractDownPayment,
                     classItem.maxStudents || '不限制',
                     classItem.currentStudents,
                     classItem.typeName,
