@@ -94,8 +94,16 @@
                 </div>
             </div>
 
+            <!-- 数据更新时间 -->
+            <div style="margin-bottom: 20px; padding: 12px 20px; background: #f8f9fa; border-left: 4px solid #007aff; border-radius: 4px;">
+                <div style="display: flex; align-items: center; color: #5f6c7b; font-size: 14px;">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span>最近一次数据更新时间：<span id="lastUpdateTime" style="color: #333; font-weight: 500;">-</span></span>
+                </div>
+            </div>
+
             <!-- 筛选条件 -->
-            <div class="data-table">
+            <div class="data-table" style="margin-bottom: 24px;">
                 <div class="toolbar">
                     <div class="toolbar-left">
                         <h3>数据筛选</h3>
@@ -125,35 +133,26 @@
             </div>
 
             <!-- 统计卡片 -->
-            <div class="stats-grid">
+            <div class="stats-grid" style="margin-bottom: 24px;">
                 <div class="stats-card">
-                    <div class="stats-update-time" id="totalUsersTime">刚刚</div>
                     <div class="stats-number" id="totalUsers">0</div>
                     <div class="stats-label">总用户数</div>
-                    <div class="stats-change stats-up">
-                        <i class="fas fa-arrow-up"></i> +12%
-                    </div>
+                    <div class="stats-description">系统中注册的用户总数量</div>
                 </div>
                 <div class="stats-card success">
-                    <div class="stats-update-time" id="activeRegistrationsTime">刚刚</div>
                     <div class="stats-number" id="activeRegistrations">0</div>
                     <div class="stats-label">有效报名</div>
-                    <div class="stats-change stats-up">
-                        <i class="fas fa-arrow-up"></i> +8%
-                    </div>
+                    <div class="stats-description">已完成报名流程的用户数</div>
                 </div>
                 <div class="stats-card danger">
-                    <div class="stats-update-time" id="blacklistCountTime">刚刚</div>
                     <div class="stats-number" id="blacklistCount">0</div>
                     <div class="stats-label">黑名单用户</div>
-                    <div class="stats-change stats-up">
-                        <i class="fas fa-arrow-up"></i> +3
-                    </div>
+                    <div class="stats-description">当前被列入黑名单的用户数</div>
                 </div>
             </div>
 
             <!-- 快捷操作 -->
-            <div class="data-table">
+            <div class="data-table" style="margin-bottom: 24px;">
                 <div class="toolbar">
                     <div class="toolbar-left">
                         <h3>快捷操作</h3>
@@ -184,7 +183,7 @@
             </div>
 
             <!-- 最近报名记录 -->
-            <div class="data-table">
+            <div class="data-table" style="margin-bottom: 0;">
                 <div class="toolbar">
                     <div class="toolbar-left">
                         <h3>最近报名记录</h3>
@@ -391,11 +390,19 @@
         // 更新数据更新时间
         function updateDataTime() {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
             
-            document.getElementById('totalUsersTime').textContent = timeStr;
-            document.getElementById('activeRegistrationsTime').textContent = timeStr;
-            document.getElementById('blacklistCountTime').textContent = timeStr;
+            const timeStr = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            
+            const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateTimeElement) {
+                lastUpdateTimeElement.textContent = timeStr;
+            }
         }
 
         // 数字动画效果

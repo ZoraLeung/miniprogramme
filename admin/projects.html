@@ -94,28 +94,32 @@
                 </div>
             </div>
 
+            <!-- 数据更新时间 -->
+            <div style="margin-bottom: 20px; padding: 12px 20px; background: #f8f9fa; border-left: 4px solid #007aff; border-radius: 4px;">
+                <div style="display: flex; align-items: center; color: #5f6c7b; font-size: 14px;">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span>最近一次数据更新时间：<span id="lastUpdateTime" style="color: #333; font-weight: 500;">-</span></span>
+                </div>
+            </div>
+
             <!-- 数据看板 -->
             <div class="stats-dashboard">
                 <div class="stats-card">
-                    <div class="stats-update-time" id="totalProjectsTime">刚刚</div>
                     <div class="stats-number" id="totalProjects">0</div>
                     <div class="stats-label">总项目数</div>
                     <div class="stats-description">系统中创建的所有培训项目数量</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="publishedProjectsTime">刚刚</div>
                     <div class="stats-number" id="publishedProjects">0</div>
                     <div class="stats-label">已上架</div>
                     <div class="stats-description">当前开放报名的项目数量</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="draftProjectsTime">刚刚</div>
                     <div class="stats-number" id="draftProjects">0</div>
                     <div class="stats-label">草稿</div>
                     <div class="stats-description">未发布的草稿项目数量</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="expiredProjectsTime">刚刚</div>
                     <div class="stats-number" id="expiredProjects">0</div>
                     <div class="stats-label">已过期</div>
                     <div class="stats-description">报名截止日期已过的项目数量</div>
@@ -351,6 +355,7 @@
             renderTable();
             updatePagination();
             updateStatistics();
+            updateDataTime();
         }
 
         // 更新统计信息
@@ -364,6 +369,24 @@
             animateCounter('publishedProjects', published);
             animateCounter('draftProjects', draft);
             animateCounter('expiredProjects', expired);
+        }
+        
+        // 更新数据更新时间
+        function updateDataTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const timeStr = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            
+            const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateTimeElement) {
+                lastUpdateTimeElement.textContent = timeStr;
+            }
         }
 
         // 数字动画
@@ -426,19 +449,19 @@
                         <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
                         <td>${project.createTime}</td>
                         <td class="action-buttons">
-                            <button class="btn btn-primary" onclick="editProject(${project.id})" title="编辑">
-                                <i class="fas fa-edit"></i> 编辑
+                            <button class="btn btn-sm btn-primary" onclick="editProject(${project.id})" title="编辑">
+                                <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn ${project.status === 'published' ? 'btn-warning' : 'btn-success'}" 
+                            <button class="btn btn-sm ${project.status === 'published' ? 'btn-warning' : 'btn-success'}" 
                                     onclick="togglePublish(${project.id})" 
                                     title="${project.status === 'published' ? '下架' : '上架'}">
-                                <i class="fas fa-${project.status === 'published' ? 'eye-slash' : 'eye'}"></i> ${project.status === 'published' ? '下架' : '上架'}
+                                <i class="fas fa-${project.status === 'published' ? 'eye-slash' : 'eye'}"></i>
                             </button>
-                            <button class="btn btn-secondary" onclick="duplicateProject(${project.id})" title="复制">
-                                <i class="fas fa-copy"></i> 复制
+                            <button class="btn btn-sm btn-secondary" onclick="duplicateProject(${project.id})" title="复制">
+                                <i class="fas fa-copy"></i>
                             </button>
-                            <button class="btn btn-danger" onclick="deleteProject(${project.id})" title="删除">
-                                <i class="fas fa-trash"></i> 删除
+                            <button class="btn btn-sm btn-danger" onclick="deleteProject(${project.id})" title="删除">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     </tr>

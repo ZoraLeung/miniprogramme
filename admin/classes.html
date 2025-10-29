@@ -91,22 +91,27 @@
                 </div>
             </div>
 
+            <!-- 数据更新时间 -->
+            <div style="margin-bottom: 20px; padding: 12px 20px; background: #f8f9fa; border-left: 4px solid #007aff; border-radius: 4px;">
+                <div style="display: flex; align-items: center; color: #5f6c7b; font-size: 14px;">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span>最近一次数据更新时间：<span id="lastUpdateTime" style="color: #333; font-weight: 500;">-</span></span>
+                </div>
+            </div>
+
             <!-- 数据看板 -->
             <div class="stats-dashboard">
                 <div class="stats-card">
-                    <div class="stats-update-time" id="totalClassesTime">刚刚</div>
                     <div class="stats-number" id="totalClasses">0</div>
                     <div class="stats-label">总班型数</div>
                     <div class="stats-description">系统中创建的所有班型总数</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="activeClassesTime">刚刚</div>
                     <div class="stats-number" id="activeClasses">0</div>
                     <div class="stats-label">开放报名</div>
                     <div class="stats-description">当前正在开放报名的班型数量</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="fullClassesTime">刚刚</div>
                     <div class="stats-number" id="fullClasses">0</div>
                     <div class="stats-label">名额已满</div>
                     <div class="stats-description">报名人数已达上限的班型数量</div>
@@ -411,6 +416,24 @@
             });
         }
 
+        // 更新数据更新时间
+        function updateDataTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const timeStr = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            
+            const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateTimeElement) {
+                lastUpdateTimeElement.textContent = timeStr;
+            }
+        }
+
         // 加载班型数据
         function loadClasses() {
             allClasses = generateMockClasses();
@@ -419,6 +442,7 @@
             renderTable();
             updatePagination();
             updateStatistics();
+            updateDataTime();
         }
 
         // 更新统计信息

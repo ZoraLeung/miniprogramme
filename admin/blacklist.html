@@ -91,22 +91,27 @@
                 </div>
             </div>
 
+            <!-- 数据更新时间 -->
+            <div style="margin-bottom: 20px; padding: 12px 20px; background: #f8f9fa; border-left: 4px solid #007aff; border-radius: 4px;">
+                <div style="display: flex; align-items: center; color: #5f6c7b; font-size: 14px;">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span>最近一次数据更新时间：<span id="lastUpdateTime" style="color: #333; font-weight: 500;">-</span></span>
+                </div>
+            </div>
+
             <!-- 数据看板 -->
             <div class="stats-dashboard">
                 <div class="stats-card">
-                    <div class="stats-update-time" id="totalBlacklistTime">刚刚</div>
                     <div class="stats-number" id="totalBlacklist">0</div>
                     <div class="stats-label">总黑名单数</div>
                     <div class="stats-description">系统中所有黑名单记录总数</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="activeBlacklistTime">刚刚</div>
                     <div class="stats-number" id="activeBlacklist">0</div>
                     <div class="stats-label">生效黑名单数</div>
                     <div class="stats-description">当前正在生效的黑名单数量</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="inactiveBlacklistTime">刚刚</div>
                     <div class="stats-number" id="inactiveBlacklist">0</div>
                     <div class="stats-label">已失效</div>
                     <div class="stats-description">已经过期或移除的黑名单记录</div>
@@ -287,8 +292,7 @@
 
         // 加载黑名单统计数据
         async function loadBlacklistStats() {
-            const refreshTimeElement = document.getElementById('refreshTime');
-            refreshTimeElement.textContent = '加载中...';
+            updateDataTime();
             
             try {
                 const response = await fetch(`${API_BASE}/blacklist/stats`);
@@ -302,8 +306,7 @@
                         animateCounter('activeBlacklist', activeBlacklist);
                         animateCounter('inactiveBlacklist', inactiveBlacklist);
                         
-                        const now = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-                        refreshTimeElement.textContent = now;
+                        updateDataTime();
                         showNotification('统计数据更新成功', 'success');
                     } else {
                         throw new Error(result.message || '获取统计数据失败');
@@ -323,7 +326,25 @@
                 animateCounter('totalBlacklist', totalBlacklist);
                 animateCounter('activeBlacklist', activeBlacklist);
                 animateCounter('inactiveBlacklist', inactiveBlacklist);
-                refreshTimeElement.textContent = '模拟';
+                updateDataTime();
+            }
+        }
+        
+        // 更新数据更新时间
+        function updateDataTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const timeStr = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            
+            const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateTimeElement) {
+                lastUpdateTimeElement.textContent = timeStr;
             }
         }
 
@@ -421,7 +442,6 @@
                                 onclick="toggleStatus(${item.id})" 
                                 title="${item.status === 'active' ? '禁用' : '启用'}">
                             <i class="fas fa-${item.status === 'active' ? 'ban' : 'check'}"></i>
-                            ${item.status === 'active' ? '禁用' : '启用'}
                         </button>
                         <button class="btn btn-sm btn-danger" onclick="deletePhone(${item.id})" title="删除">
                             <i class="fas fa-trash"></i>

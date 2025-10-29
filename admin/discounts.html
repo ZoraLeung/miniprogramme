@@ -91,6 +91,32 @@
                 </div>
             </div>
 
+            <!-- 数据更新时间 -->
+            <div style="margin-bottom: 20px; padding: 12px 20px; background: #f8f9fa; border-left: 4px solid #007aff; border-radius: 4px;">
+                <div style="display: flex; align-items: center; color: #5f6c7b; font-size: 14px;">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span>最近一次数据更新时间：<span id="lastUpdateTime" style="color: #333; font-weight: 500;">-</span></span>
+                </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalDiscounts">0</div>
+                    <div class="stats-label">总优惠数</div>
+                    <div class="stats-description">系统中创建的所有优惠总数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" id="activeDiscounts">0</div>
+                    <div class="stats-label">生效中</div>
+                    <div class="stats-description">当前正在生效的优惠数量</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" id="expiredDiscounts">0</div>
+                    <div class="stats-label">已过期</div>
+                    <div class="stats-description">已经过期的优惠数量</div>
+                </div>
+            </div>
 
             <!-- 工具栏 -->
             <div class="toolbar">
@@ -143,6 +169,7 @@
                                 <th>优惠ID</th>
                                 <th>优惠名称</th>
                                 <th>所属项目</th>
+                                <th>适用班型</th>
                                 <th>优惠类型</th>
                                 <th>优惠金额</th>
                                 <th>生效人群</th>
@@ -189,9 +216,16 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">所属项目 <span class="form-required">*</span></label>
-                        <select class="form-select" id="discountProject" required>
+                        <select class="form-select" id="discountProject" required onchange="onProjectChange()">
                             <option value="">请选择项目</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">适用班型</label>
+                        <select class="form-select" id="discountClassType">
+                            <option value="">全部班型</option>
+                        </select>
+                        <small style="color: #999; font-size: 12px; margin-top: 5px; display: block;">不选择则适用于该项目下的所有班型</small>
                     </div>
                     <div class="form-group">
                         <label class="form-label">优惠类型 <span class="form-required">*</span></label>
@@ -284,6 +318,24 @@
         let filteredDiscounts = [];
         let editingDiscountId = null;
 
+        // 更新数据更新时间
+        function updateDataTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const timeStr = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            
+            const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateTimeElement) {
+                lastUpdateTimeElement.textContent = timeStr;
+            }
+        }
+
         // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', function() {
             loadDiscounts();
@@ -309,6 +361,7 @@
                 { value: 'non_contract', label: '非协议用户' },
                 { value: 'all', label: '全部用户' }
             ];
+            const classTypeNames = ['11天系统班', '13天系统班', '14天线上线下班', '在职班'];
             const allProjects = generateMockProjects();
             const now = Date.now();
             const mockData = [];
@@ -318,6 +371,13 @@
                 const type = discountTypes[typeIndex];
                 const project = allProjects[Math.floor(Math.random() * allProjects.length)];
                 const audience = audienceOptions[Math.floor(Math.random() * audienceOptions.length)];
+                
+                // 随机选择班型（30%概率不选择班型）
+                const hasClassType = Math.random() > 0.3;
+                const classTypeIndex = hasClassType ? Math.floor(Math.random() * classTypeNames.length) : null;
+                const classTypeIdBase = (project.id - 1) * 4;
+                const classTypeId = hasClassType ? (classTypeIdBase + classTypeIndex + 1) : null;
+                const classTypeName = hasClassType ? classTypeNames[classTypeIndex] : null;
 
                 // 创建时间、生效时间、失效时间
                 const createTime = new Date(now - Math.random() * 20 * 24 * 60 * 60 * 1000);
@@ -356,6 +416,8 @@
                     typeName: discountTypeNames[typeIndex],
                     value,
                     maxDiscount,
+                    classTypeId: classTypeId,
+                    classTypeName: classTypeName,
                     projectId: project.id,
                     projectName: project.name,
                     audience: audience.value,
@@ -381,6 +443,36 @@
             loadProjects();
             renderTable();
             updatePagination();
+            updateStatistics();
+            updateDataTime();
+        }
+
+        // 更新统计信息
+        function updateStatistics() {
+            const total = allDiscounts.length;
+            const active = allDiscounts.filter(d => d.status === 'active').length;
+            const expired = allDiscounts.filter(d => d.status === 'expired').length;
+            
+            animateCounter('totalDiscounts', total);
+            animateCounter('activeDiscounts', active);
+            animateCounter('expiredDiscounts', expired);
+        }
+
+        // 数字动画
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 800;
+            const increment = targetValue / (duration / 16);
+            let currentValue = 0;
+
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue);
+            }, 16);
         }
 
         // 加载项目数据到下拉框
@@ -397,6 +489,87 @@
                 option.textContent = project.name;
                 discountProject.appendChild(option);
             });
+        }
+
+        // 模拟班型数据（示例）
+        function generateMockClassTypes(projectId) {
+            if (!projectId) return [];
+            
+            const classTypes = [
+                { id: 1, name: '11天系统班', projectId: 1 },
+                { id: 2, name: '13天系统班', projectId: 1 },
+                { id: 3, name: '14天线上线下班', projectId: 1 },
+                { id: 4, name: '在职班', projectId: 1 },
+                { id: 5, name: '11天系统班', projectId: 2 },
+                { id: 6, name: '13天系统班', projectId: 2 },
+                { id: 7, name: '14天线上线下班', projectId: 2 },
+                { id: 8, name: '在职班', projectId: 2 },
+                { id: 9, name: '11天系统班', projectId: 3 },
+                { id: 10, name: '13天系统班', projectId: 3 },
+                { id: 11, name: '14天线上线下班', projectId: 3 },
+                { id: 12, name: '在职班', projectId: 3 },
+                { id: 13, name: '11天系统班', projectId: 4 },
+                { id: 14, name: '13天系统班', projectId: 4 },
+                { id: 15, name: '14天线上线下班', projectId: 4 },
+                { id: 16, name: '在职班', projectId: 4 },
+                { id: 17, name: '11天系统班', projectId: 5 },
+                { id: 18, name: '13天系统班', projectId: 5 },
+                { id: 19, name: '14天线上线下班', projectId: 5 },
+                { id: 20, name: '在职班', projectId: 5 }
+            ];
+            
+            return classTypes.filter(ct => ct.projectId === projectId);
+        }
+
+        // 项目切换时加载对应班型
+        function onProjectChange() {
+            const projectId = parseInt(document.getElementById('discountProject').value);
+            const classTypeSelect = document.getElementById('discountClassType');
+            
+            // 清空班型选项
+            classTypeSelect.innerHTML = '<option value="">全部班型</option>';
+            
+            if (!projectId) return;
+            
+            // 加载该项目下的班型
+            const classTypes = generateMockClassTypes(projectId);
+            classTypes.forEach(classType => {
+                const option = document.createElement('option');
+                option.value = classType.id;
+                option.textContent = classType.name;
+                classTypeSelect.appendChild(option);
+            });
+        }
+
+        // 获取班型信息
+        function getClassTypeInfo(classTypeId) {
+            if (!classTypeId) return { id: null, name: null };
+            
+            const allClassTypes = [
+                { id: 1, name: '11天系统班' },
+                { id: 2, name: '13天系统班' },
+                { id: 3, name: '14天线上线下班' },
+                { id: 4, name: '在职班' },
+                { id: 5, name: '11天系统班' },
+                { id: 6, name: '13天系统班' },
+                { id: 7, name: '14天线上线下班' },
+                { id: 8, name: '在职班' },
+                { id: 9, name: '11天系统班' },
+                { id: 10, name: '13天系统班' },
+                { id: 11, name: '14天线上线下班' },
+                { id: 12, name: '在职班' },
+                { id: 13, name: '11天系统班' },
+                { id: 14, name: '13天系统班' },
+                { id: 15, name: '14天线上线下班' },
+                { id: 16, name: '在职班' },
+                { id: 17, name: '11天系统班' },
+                { id: 18, name: '13天系统班' },
+                { id: 19, name: '14天线上线下班' },
+                { id: 20, name: '在职班' }
+            ];
+            
+            const classType = allClassTypes.find(ct => ct.id === classTypeId);
+            return classType || { id: null, name: null };
         }
 
 
@@ -468,6 +641,7 @@
                             <div style="font-weight: bold;">${discount.name}</div>
                         </td>
                         <td>${discount.projectName}</td>
+                        <td><span style="background: #fff3e0; color: #f57c00; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${discount.classTypeName || '全部班型'}</span></td>
                         <td><span style="background: #f0f8f0; color: #52c41a; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${discount.typeName}</span></td>
                         <td><strong style="color: #f39c12;">${formatDiscountValue(discount.type, discount.value, discount.maxDiscount)}</strong></td>
                         <td><span style="display: inline-block; background: #eef3ff; color: #3b5bdb; padding: 2px 10px; border-radius: 12px; font-size: 12px;">${getAudienceLabel(discount.audience)}</span></td>
@@ -569,6 +743,10 @@
             document.getElementById('discountModalTitle').textContent = '编辑优惠';
             document.getElementById('discountName').value = discount.name;
             document.getElementById('discountProject').value = discount.projectId;
+            onProjectChange();
+            setTimeout(() => {
+                document.getElementById('discountClassType').value = discount.classTypeId || '';
+            }, 0);
             document.getElementById('discountType').value = discount.type;
             document.getElementById('discountValue').value = discount.value;
             document.getElementById('discountStatus').value = discount.status;
@@ -582,6 +760,7 @@
             const formData = {
                 name: document.getElementById('discountName').value.trim(),
                 projectId: parseInt(document.getElementById('discountProject').value, 10),
+                classTypeId: parseInt(document.getElementById('discountClassType').value) || null,
                 type: document.getElementById('discountType').value,
                 value: parseFloat(document.getElementById('discountValue').value),
                 status: document.getElementById('discountStatus').value,
@@ -631,11 +810,13 @@
                 // 编辑模式
                 const discountIndex = allDiscounts.findIndex(d => d.id === editingDiscountId);
                 const previous = allDiscounts[discountIndex];
+                const classTypeInfo = getClassTypeInfo(formData.classTypeId);
                 allDiscounts[discountIndex] = {
                     ...previous,
                     ...formData,
                     typeName: typeNames[formData.type],
                     projectName: project.name,
+                    classTypeName: classTypeInfo.name,
                     maxDiscount: calculateMaxDiscount(formData.type, formData.value),
                     description: buildDiscountDescription(project.name, typeNames[formData.type]),
                     audienceName: getAudienceLabel(formData.audience)
@@ -648,11 +829,13 @@
                 const startTimeText = startBaseline.toISOString().slice(0, 19).replace('T', ' ');
                 const endTimeText = endBaseline.toISOString().slice(0, 19).replace('T', ' ');
 
+                const classTypeInfo = getClassTypeInfo(formData.classTypeId);
                 const newDiscount = {
                     id: Math.max(...allDiscounts.map(d => d.id), 0) + 1,
                     ...formData,
                     typeName: typeNames[formData.type],
                     projectName: project.name,
+                    classTypeName: classTypeInfo.name,
                     maxDiscount: calculateMaxDiscount(formData.type, formData.value),
                     usedCount: 0,
                     description: buildDiscountDescription(project.name, typeNames[formData.type]),

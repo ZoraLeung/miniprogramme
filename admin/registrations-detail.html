@@ -99,6 +99,33 @@
                 </div>
             </div>
 
+            <!-- 数据更新时间 -->
+            <div style="margin-bottom: 20px; padding: 12px 20px; background: #f8f9fa; border-left: 4px solid #007aff; border-radius: 4px;">
+                <div style="display: flex; align-items: center; color: #5f6c7b; font-size: 14px;">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span>最近一次数据更新时间：<span id="lastUpdateTime" style="color: #333; font-weight: 500;">-</span></span>
+                </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-dashboard">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalRegistrations">0</div>
+                    <div class="stats-label">总报名数</div>
+                    <div class="stats-description">所有用户提交的报名申请总数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" id="pendingRegistrations">0</div>
+                    <div class="stats-label">待审核</div>
+                    <div class="stats-description">等待管理员审核的报名申请</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" id="approvedRegistrations">0</div>
+                    <div class="stats-label">已通过</div>
+                    <div class="stats-description">审核通过的有效报名数量</div>
+                </div>
+            </div>
+
             <!-- 工具栏 -->
             <div class="toolbar">
                 <div class="toolbar-left">
@@ -107,6 +134,9 @@
                     </button>
                     <button class="btn btn-info" onclick="batchApprove()" id="batchApproveBtn" disabled>
                         <i class="fas fa-check"></i> 批量审核
+                    </button>
+                    <button class="btn btn-warning" onclick="batchPayment()" id="batchPaymentBtn" disabled>
+                        <i class="fas fa-money-bill-wave"></i> 批量缴费
                     </button>
                 </div>
                 <div class="toolbar-right">
@@ -130,28 +160,6 @@
                 </div>
             </div>
 
-            <!-- 数据看板 -->
-            <div class="stats-dashboard">
-                <div class="stats-card">
-                    <div class="stats-update-time" id="totalRegistrationsTime">刚刚</div>
-                    <div class="stats-number" id="totalRegistrations">0</div>
-                    <div class="stats-label">总报名数</div>
-                    <div class="stats-description">所有用户提交的报名申请总数</div>
-                </div>
-                <div class="stats-card">
-                    <div class="stats-update-time" id="pendingRegistrationsTime">刚刚</div>
-                    <div class="stats-number" id="pendingRegistrations">0</div>
-                    <div class="stats-label">待审核</div>
-                    <div class="stats-description">等待管理员审核的报名申请</div>
-                </div>
-                <div class="stats-card">
-                    <div class="stats-update-time" id="approvedRegistrationsTime">刚刚</div>
-                    <div class="stats-number" id="approvedRegistrations">0</div>
-                    <div class="stats-label">已通过</div>
-                    <div class="stats-description">审核通过的有效报名数量</div>
-                </div>
-            </div>
-
             <!-- 数据表格 -->
             <div class="data-table">
                 <div class="table-responsive" style="overflow-x: auto; max-width: 100%; border: 1px solid #e9ecef; border-radius: 8px;">
@@ -165,7 +173,6 @@
                                 <th style="width: 100px; min-width: 100px;">姓名</th>
                                 <th style="width: 100px; min-width: 100px;">微信号</th>
                                 <th style="width: 120px; min-width: 120px;">手机号</th>
-                                <th style="width: 140px; min-width: 140px;">身份证</th>
                                 <th style="width: 100px; min-width: 100px;">岗位代码</th>
                                 <th style="width: 150px; min-width: 150px;">岗位名称</th>
                                 <th style="width: 80px; min-width: 80px;">招录人数</th>
@@ -177,9 +184,12 @@
                                 <th style="width: 80px; min-width: 80px;">优惠金额</th>
                                 <th style="width: 100px; min-width: 100px;">推荐老学员</th>
                                 <th style="width: 80px; min-width: 80px;">应收学费</th>
+                                <th style="width: 100px; min-width: 100px;">身份证</th>
                                 <th style="width: 100px; min-width: 100px;">笔试成绩</th>
                                 <th style="width: 100px; min-width: 100px;">转账截图</th>
                                 <th style="width: 100px; min-width: 100px;">审核状态</th>
+                                <th style="width: 100px; min-width: 100px;">已收学费</th>
+                                <th style="width: 100px; min-width: 100px;">缴费状态</th>
                                 <th style="width: 140px; min-width: 140px;">操作</th>
                             </tr>
                         </thead>
@@ -421,29 +431,26 @@
                             <input type="number" class="form-control" id="detailTotalFee" readonly style="background: #f5f5f5;" min="0" step="0.01">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">实际学费</label>
+                            <label class="form-label">已收学费</label>
                             <input type="number" class="form-control" id="detailActualFee" min="0" step="0.01">
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <!-- 第七行 -->
-                        <div class="form-group">
-                            <label class="form-label">审核状态</label>
-                            <select class="form-select" id="detailStatus">
-                                <option value="pending">待审核</option>
-                                <option value="approved">已审核</option>
-                                <option value="rejected">已拒绝</option>
-                            </select>
+                    <div class="form-group">
+                        <!-- 审核状态信息显示（只读） -->
+                        <label class="form-label">审核状态</label>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px;">
+                            <span id="detailStatusDisplay" style="font-weight: 500;"></span>
+                            <span id="detailApproverInfo" style="font-size: 12px; color: #666;"></span>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">缴费状态</label>
-                            <select class="form-select" id="detailPaymentStatus">
-                                <option value="unpaid">未缴费</option>
-                                <option value="paid">已缴费</option>
-                                <option value="partial">已缴定金</option>
-                                <option value="refunded">已退费</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">缴费状态</label>
+                        <select class="form-select" id="detailPaymentStatus">
+                            <option value="unpaid">未缴费</option>
+                            <option value="paid">已缴费</option>
+                            <option value="partial">已缴定金</option>
+                            <option value="refunded">已退费</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">备注描述</label>
@@ -757,6 +764,24 @@
             }
         }
 
+        // 更新数据更新时间
+        function updateDataTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const timeStr = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            
+            const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateTimeElement) {
+                lastUpdateTimeElement.textContent = timeStr;
+            }
+        }
+
         // 加载报名数据
         function loadRegistrations() {
             allRegistrations = generateMockRegistrations();
@@ -765,6 +790,7 @@
             renderTable();
             updatePagination();
             updateStatistics();
+            updateDataTime();
         }
 
         // 更新统计信息
@@ -915,11 +941,6 @@
                             <span style="font-weight: 500;">${registration.phone}</span>
                         </td>
                         <td>
-                            <div style="font-size: 12px; margin-bottom: 2px;">${registration.idCard}</div>
-                            <img src="${registration.idCardImage}" style="width: 30px; height: 20px; object-fit: cover; border-radius: 2px; cursor: pointer;" 
-                                 onclick="viewImage('${registration.idCardImage}', '身份证图片')" title="点击查看身份证图片">
-                        </td>
-                        <td>
                             <span style="background: #ecf0f1; color: #34495e; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${registration.positionCode}</span>
                         </td>
                         <td>
@@ -951,7 +972,10 @@
                             <strong style="color: #fa541c;">¥${registration.totalFee}</strong>
                         </td>
                         <td>
-                            <div style="font-size: 12px; margin-bottom: 2px;">¥${registration.actualFee}</div>
+                            <img src="${registration.idCardImage}" style="width: 30px; height: 20px; object-fit: cover; border-radius: 2px; cursor: pointer;" 
+                                 onclick="viewImage('${registration.idCardImage}', '身份证图片')" title="点击查看身份证图片">
+                        </td>
+                        <td>
                             <img src="${registration.writtenScoreImage}" style="width: 30px; height: 20px; object-fit: cover; border-radius: 2px; cursor: pointer;" 
                                  onclick="viewImage('${registration.writtenScoreImage}', '笔试成绩图片')" title="点击查看笔试成绩图片">
                         </td>
@@ -960,6 +984,19 @@
                                  onclick="viewImage('${registration.paymentImage}', '转账截图')" title="点击查看转账截图">
                         </td>
                         <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <strong style="color: #52c41a; cursor: pointer;" 
+                                        onclick="editActualFeeInline(${registration.id}, ${registration.actualFee})"
+                                        title="点击编辑已收学费">¥${registration.actualFee}</strong>
+                                <i class="fas fa-edit" style="font-size: 12px; color: #999; cursor: pointer;" 
+                                   onclick="editActualFeeInline(${registration.id}, ${registration.actualFee})"
+                                   title="点击编辑已收学费"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge ${getPaymentStatusInfo(registration.paymentStatus).class}">${getPaymentStatusInfo(registration.paymentStatus).text}</span>
+                        </td>
                         <td class="action-buttons">
                             <button class="btn btn-sm btn-info" onclick="viewAndEditDetail(${registration.id})" title="查看/编辑">
                                 <i class="fas fa-edit"></i>
@@ -1194,7 +1231,22 @@
                 document.getElementById('detailReferrerName').value = registration.referrerName || '';
                 document.getElementById('detailTotalFee').value = registration.totalFee;
                 document.getElementById('detailActualFee').value = registration.actualFee;
-                document.getElementById('detailStatus').value = registration.status;
+                
+                // 设置审核状态显示(只读)
+                const statusInfo = getStatusInfo(registration.status);
+                const statusDisplay = document.getElementById('detailStatusDisplay');
+                const approverInfo = document.getElementById('detailApproverInfo');
+                statusDisplay.textContent = statusInfo.text;
+                statusDisplay.style.color = statusInfo.class.includes('active') ? '#52c41a' : 
+                                                 statusInfo.class.includes('success') ? '#52c41a' : 
+                                                 statusInfo.class.includes('warning') ? '#faad14' : '#ff4d4f';
+                
+                if (registration.approver && registration.approveTime) {
+                    approverInfo.textContent = `审核人:${registration.approver} | 时间:${registration.approveTime}`;
+                } else {
+                    approverInfo.textContent = '';
+                }
+                
                 document.getElementById('detailPaymentStatus').value = registration.paymentStatus;
 
                 // 处理优惠选择
@@ -1277,7 +1329,7 @@
                 discountAmount: parseFloat(document.getElementById('detailDiscountAmount').value) || 0,
                 referrerName: document.getElementById('detailReferrerName').value.trim(),
                 actualFee: parseFloat(document.getElementById('detailActualFee').value) || 0,
-                status: document.getElementById('detailStatus').value,
+                // 注意：审核状态不通过表单修改，仅通过审核按钮操作
                 paymentStatus: document.getElementById('detailPaymentStatus').value,
                 remarks: document.getElementById('detailRemarks').value.trim()
             };
@@ -1312,7 +1364,12 @@
                 registration.approveTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 
                 // 更新界面
-                document.getElementById('detailStatus').value = 'approved';
+                const statusInfo = getStatusInfo('approved');
+                const statusDisplay = document.getElementById('detailStatusDisplay');
+                const approverInfo = document.getElementById('detailApproverInfo');
+                statusDisplay.textContent = statusInfo.text;
+                statusDisplay.style.color = '#52c41a';
+                approverInfo.textContent = `审核人:管理员 | 时间:${new Date().toISOString().slice(0, 19).replace('T', ' ')}`;
                 document.getElementById('approveDetailBtn').style.display = 'none';
                 document.getElementById('rejectDetailBtn').style.display = 'none';
                 
@@ -1336,7 +1393,12 @@
                 registration.remarks = (registration.remarks ? registration.remarks + '\n' : '') + `拒绝原因：${reason}`;
                 
                 // 更新界面
-                document.getElementById('detailStatus').value = 'rejected';
+                const statusInfo = getStatusInfo('rejected');
+                const statusDisplay = document.getElementById('detailStatusDisplay');
+                const approverInfo = document.getElementById('detailApproverInfo');
+                statusDisplay.textContent = statusInfo.text;
+                statusDisplay.style.color = '#ff4d4f';
+                approverInfo.textContent = `审核人:管理员 | 时间:${new Date().toISOString().slice(0, 19).replace('T', ' ')}`;
                 document.getElementById('approveDetailBtn').style.display = 'none';
                 document.getElementById('rejectDetailBtn').style.display = 'none';
                 
@@ -1402,9 +1464,14 @@
         // 更新批量审核按钮
         function updateBatchApproveButton() {
             const checked = document.querySelectorAll('.registration-checkbox:checked').length;
-            const batchBtn = document.getElementById('batchApproveBtn');
-            batchBtn.disabled = checked === 0;
-            batchBtn.innerHTML = checked > 0 ? `<i class="fas fa-check"></i> 批量审核 (${checked})` : '<i class="fas fa-check"></i> 批量审核';
+            const batchApproveBtn = document.getElementById('batchApproveBtn');
+            const batchPaymentBtn = document.getElementById('batchPaymentBtn');
+            
+            batchApproveBtn.disabled = checked === 0;
+            batchApproveBtn.innerHTML = checked > 0 ? `<i class="fas fa-check"></i> 批量审核 (${checked})` : '<i class="fas fa-check"></i> 批量审核';
+            
+            batchPaymentBtn.disabled = checked === 0;
+            batchPaymentBtn.innerHTML = checked > 0 ? `<i class="fas fa-money-bill-wave"></i> 批量缴费 (${checked})` : '<i class="fas fa-money-bill-wave"></i> 批量缴费';
         }
 
         // 监听复选框变化
@@ -1436,6 +1503,91 @@
                 updateStatistics();
                 document.getElementById('selectAll').checked = false;
             }
+        }
+
+        // 批量缴费
+        function batchPayment() {
+            const checkboxes = document.querySelectorAll('.registration-checkbox:checked');
+            if (checkboxes.length === 0) return;
+
+            // 筛选出已审核通过但未缴费的报名记录
+            const idsToPayment = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            const validPaymentRegistrations = allRegistrations.filter(registration => 
+                idsToPayment.includes(registration.id) && 
+                (registration.status === 'approved' || registration.status === 'paid') &&
+                registration.paymentStatus !== 'paid'
+            );
+
+            if (validPaymentRegistrations.length === 0) {
+                showNotification('选中的报名记录中没有可缴费的记录(仅已审核通过的记录可以缴费)', 'warning');
+                return;
+            }
+
+            const totalAmount = validPaymentRegistrations.reduce((sum, registration) => sum + registration.actualFee, 0);
+
+            if (confirm(`确定要将选中的 ${validPaymentRegistrations.length} 个报名记录标记为已缴费吗?\n总金额:¥${totalAmount.toFixed(2)}`)) {
+                const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                
+                allRegistrations.forEach(registration => {
+                    if (idsToPayment.includes(registration.id) && 
+                        (registration.status === 'approved' || registration.status === 'paid') &&
+                        registration.paymentStatus !== 'paid') {
+                        registration.paymentStatus = 'paid';
+                        registration.paymentTime = now;
+                    }
+                });
+                
+                showNotification(`成功标记 ${validPaymentRegistrations.length} 个报名记录为已缴费,总金额:¥${totalAmount.toFixed(2)}`, 'success');
+                renderTable();
+                updateStatistics();
+                document.getElementById('selectAll').checked = false;
+            }
+        }
+
+        // 内联编辑已收学费
+        function editActualFeeInline(registrationId, currentFee) {
+            const registration = allRegistrations.find(r => r.id === registrationId);
+            if (!registration) return;
+
+            // 如果状态不是已通过或已缴费,不允许编辑已收学费
+            if (registration.status !== 'approved' && registration.status !== 'paid') {
+                showNotification('只有审核通过的报名才能编辑已收学费', 'warning');
+                return;
+            }
+
+            const newFee = prompt(`请输入新的已收学费金额:\n当前金额: ¥${currentFee}\n学员: ${registration.studentName}`, currentFee);
+            
+            if (newFee === null) return; // 用户取消
+            
+            const parsedFee = parseFloat(newFee);
+            
+            if (isNaN(parsedFee) || parsedFee < 0) {
+                showNotification('请输入有效的金额', 'error');
+                return;
+            }
+            
+            if (parsedFee > registration.totalFee) {
+                showNotification(`已收学费不能超过应收学费 (¥${registration.totalFee})`, 'warning');
+                return;
+            }
+            
+            // 更新数据
+            registration.actualFee = parsedFee;
+            
+            // 根据已收学费自动更新缴费状态
+            if (parsedFee >= registration.totalFee) {
+                registration.paymentStatus = 'paid';
+            } else if (parsedFee > 0) {
+                registration.paymentStatus = 'partial';
+            } else {
+                registration.paymentStatus = 'unpaid';
+            }
+            
+            registration.paymentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            
+            showNotification(`已收学费已更新为 ¥${parsedFee.toFixed(2)}`, 'success');
+            renderTable();
+            updateStatistics();
         }
 
         // 导出报名数据

@@ -94,22 +94,27 @@
                 </div>
             </div>
 
+            <!-- 数据更新时间 -->
+            <div style="margin-bottom: 20px; padding: 12px 20px; background: #f8f9fa; border-left: 4px solid #007aff; border-radius: 4px;">
+                <div style="display: flex; align-items: center; color: #5f6c7b; font-size: 14px;">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span>最近一次数据更新时间：<span id="lastUpdateTime" style="color: #333; font-weight: 500;">-</span></span>
+                </div>
+            </div>
+
             <!-- 数据看板 -->
             <div class="stats-dashboard">
                 <div class="stats-card">
-                    <div class="stats-update-time" id="totalVisitorsTime">刚刚</div>
                     <div class="stats-number" id="totalVisitors">-</div>
                     <div class="stats-label">访问总人数</div>
                     <div class="stats-description">累计访问小程序的用户总数</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="validUsersTime">刚刚</div>
                     <div class="stats-number" id="validUsers">-</div>
                     <div class="stats-label">有效用户数</div>
                     <div class="stats-description">已授权手机号的有效用户</div>
                 </div>
                 <div class="stats-card">
-                    <div class="stats-update-time" id="recentVisitorsTime">刚刚</div>
                     <div class="stats-number" id="recentVisitors">-</div>
                     <div class="stats-label">近一月访问</div>
                     <div class="stats-description">最近30天内的活跃用户数量</div>
@@ -121,9 +126,6 @@
                 <div class="toolbar-left">
                     <button class="btn btn-success" onclick="exportUsers()">
                         <i class="fas fa-download"></i> 导出数据
-                    </button>
-                    <button class="btn btn-secondary" onclick="loadUserStats()">
-                        <i class="fas fa-sync" id="refreshIcon"></i> 刷新数据
                     </button>
                 </div>
                 <div class="toolbar-right">
@@ -325,11 +327,19 @@
         // 更新数据更新时间
         function updateDataTime() {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
             
-            document.getElementById('totalVisitorsTime').textContent = timeStr;
-            document.getElementById('validUsersTime').textContent = timeStr;
-            document.getElementById('recentVisitorsTime').textContent = timeStr;
+            const timeStr = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            
+            const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+            if (lastUpdateTimeElement) {
+                lastUpdateTimeElement.textContent = timeStr;
+            }
         }
 
         // 模拟用户数据
